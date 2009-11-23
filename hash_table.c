@@ -109,6 +109,7 @@ hash_table_create(uint32_t (*hash_function)(const void *key),
 	ht->rehash = hash_sizes[ht->size_index].rehash;
 	ht->max_entries = hash_sizes[ht->size_index].max_entries;
 	ht->hash_function = hash_function;
+	ht->key_equals_function = key_equals_function;
 	ht->table = calloc(ht->size, sizeof(*ht->table));
 
 	if (ht->table == NULL) {
