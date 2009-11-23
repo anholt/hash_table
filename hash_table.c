@@ -214,7 +214,7 @@ hash_table_insert(struct hash_table *ht, const void *key, void *data)
  * the table deleting entries is safe.
  */
 void
-hash_table_delete_entry(struct hash_table *ht, struct hash_entry *entry)
+hash_table_remove(struct hash_table *ht, struct hash_entry *entry)
 {
 	entry->key = deleted_key;
 	ht->entries--;

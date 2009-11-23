@@ -22,6 +22,7 @@ AM_CFLAGS = $(WARN_CFLAGS) -I..
 LDADD = ../libhash_table.la
 
 TESTS = \
+	delete_and_lookup \
 	insert_and_lookup \
 	null_destroy \
 	$()

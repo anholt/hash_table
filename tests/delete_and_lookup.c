@@ -22,38 +22,52 @@
  *
  * Authors:
  *    Eric Anholt <eric@anholt.net>
- *
  */
 
-#include <inttypes.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include "hash_table.h"
+#include "fnv_hash.h"
 
-struct hash_entry {
-	uint32_t hash;
-	const void *key;
-	void *data;
-};
+/* Return collisions, so we can test the deletion behavior for chained
+ * objects.
+ */
+static uint32_t
+badhash(const void *key)
+{
+	return 1;
+}
 
-struct hash_table {
-	struct hash_entry *table;
-	uint32_t (*hash_function)(const void *key);
-	int (*key_equals_function)(const void *a, const void *b);
-	uint32_t size;
-	uint32_t rehash;
-	uint32_t max_entries;
-	uint32_t size_index;
-	uint32_t entries;
-};
+int
+main(int argc, char **argv)
+{
+	struct hash_table *ht;
+	const char *str1 = "test1";
+	const char *str2 = "test2";
+	struct hash_entry *entry;
 
-struct hash_table *hash_table_create(uint32_t (*hash_function)(const void *key),
-				     int (*key_equals_function)(const void *a,
-								const void *b));
-void hash_table_destroy(struct hash_table *ht,
-			void (*delete_function)(struct hash_entry *entry));
+	ht = hash_table_create(badhash, string_key_equals);
 
-struct hash_entry *hash_table_insert(struct hash_table *ht, const void *key,
-				     void *data);
-struct hash_entry *hash_table_search(struct hash_table *ht, const void *key);
-void hash_table_remove(struct hash_table *ht, struct hash_entry *entry);
+	hash_table_insert(ht, str1, NULL);
+	hash_table_insert(ht, str2, NULL);
 
-struct hash_entry *hash_table_next_entry(struct hash_table *ht,
-					 struct hash_entry *entry);
+	entry = hash_table_search(ht, str1);
+	assert(strcmp(entry->key, str1) == 0);
+
+	entry = hash_table_search(ht, str2);
+	assert(strcmp(entry->key, str2) == 0);
+
+	hash_table_remove(ht, hash_table_search(ht, str1));
+
+	entry = hash_table_search(ht, str1);
+	assert(entry == NULL);
+
+	entry = hash_table_search(ht, str2);
+	assert(strcmp(entry->key, str2) == 0);
+
+	hash_table_destroy(NULL, NULL);
+
+	return 0;
+}
