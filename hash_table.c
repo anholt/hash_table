@@ -36,6 +36,8 @@
 
 #include "hash_table.h"
 
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
+
 /*
  * From Knuth -- a good choice for hash/rehash values is p, p-2 where
  * p and p-2 are both prime.  These tables are sized to have an extra 10%
@@ -111,6 +113,7 @@ hash_table_create(uint32_t (*hash_function)(const void *key),
 	ht->hash_function = hash_function;
 	ht->key_equals_function = key_equals_function;
 	ht->table = calloc(ht->size, sizeof(*ht->table));
+	ht->entries = 0;
 
 	if (ht->table == NULL) {
 		free(ht);
@@ -152,19 +155,19 @@ hash_table_search(struct hash_table *ht, const void *key)
 	uint32_t hash, hash_address;
 
 	hash = ht->hash_function(key);
-	hash_address = hash & ht->size;
+	hash_address = hash % ht->size;
 	do {
 		struct hash_entry *entry = ht->table + hash_address;
 
 		if (entry_is_free(entry)) {
 			return NULL;
-		} else if (entry_is_present(entry) && hash == hash) {
+		} else if (entry_is_present(entry) && entry->hash == hash) {
 			if (ht->key_equals_function(key, entry->key)) {
 				return entry;
 			}
 		}
 
-		hash_address = (hash_address + ht->rehash) & ht->size;
+		hash_address = (hash_address + ht->rehash) % ht->size;
 	} while (hash_address != hash % ht->size);
 
 	return NULL;
@@ -173,7 +176,33 @@ hash_table_search(struct hash_table *ht, const void *key)
 static void
 hash_table_expand(struct hash_table *ht)
 {
-	/* XXX */
+	struct hash_table old_ht;
+	struct hash_entry *table, *entry;
+
+	if (ht->size_index + 1 == ARRAY_SIZE(hash_sizes))
+		return;
+
+	table = calloc(hash_sizes[ht->size_index + 1].size, sizeof(*ht->table));
+	if (table == NULL)
+		return;
+
+	old_ht = *ht;
+
+	ht->table = table;
+	ht->size_index++;
+	ht->size = hash_sizes[ht->size_index].size;
+	ht->rehash = hash_sizes[ht->size_index].rehash;
+	ht->max_entries = hash_sizes[ht->size_index].max_entries;
+
+	for (entry = old_ht.table;
+	     entry != old_ht.table + old_ht.size;
+	     entry++) {
+		if (entry_is_present(entry)) {
+			hash_table_insert(ht, entry->key, entry->data);
+		}
+	}
+
+	free(old_ht.table);
 }
 
 struct hash_entry *
@@ -181,12 +210,12 @@ hash_table_insert(struct hash_table *ht, const void *key, void *data)
 {
 	uint32_t hash, hash_address;
 
-	if (ht->entries + 1 > ht->max_entries) {
+	if (ht->entries >= ht->max_entries) {
 		hash_table_expand(ht);
 	}
 
 	hash = ht->hash_function(key);
-	hash_address = hash & ht->size;
+	hash_address = hash % ht->size;
 	do {
 		struct hash_entry *entry = ht->table + hash_address;
 
@@ -198,7 +227,7 @@ hash_table_insert(struct hash_table *ht, const void *key, void *data)
 			return entry;
 		}
 
-		hash_address = (hash_address + ht->rehash) & ht->size;
+		hash_address = (hash_address + ht->rehash) % ht->size;
 	} while (hash_address != hash % ht->size);
 
 	/* We could hit here if a required resize failed. An unchecked-malloc
