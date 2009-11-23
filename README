@@ -1,0 +1,45 @@
+This is a simple hash table implementation written in plain old C.  The goal
+is for this code to be reusable in many of the projects I've worked on that
+could use something better than a poorly-tuned chaining implementation.
+
+The intention is that users of this code copy it directly into their
+repositories, as it's quite small and should see very little development.
+
+The summary of this implementation would be that it uses open addressing
+with rehashing.  The table stores for each entry:
+
+ * uint32_t hash of the key.
+ * pointer to the key.
+ * pointer to the data.
+
+Inserts occur at key->hash % hash->size.  When an insert collides, the insert
+reattempts at (key->hash % hash->size + hash->reprobe) % hash->size, and
+onwards at increments of reprobe until a free or dead entry is found.
+
+When searching, the search starts at key % hash_size and continues at
+increments of reprobe as with inserts, until the matching entry or an
+unallocated entry is found.
+
+When deleting an entry, the entry is marked deleted.
+
+Performance considerations:
+
+ * Only an extra 10% free is given.
+
+	This means that as entries are added, the performance of insertion and
+	lookups will degrade as one approaches maximum entries until the table
+	gets resized.  Unless an outside entry management results in a maximum
+	number of entries close to the hash table's current size limit, this
+	shouldn't be a concern.
+
+ * Repeated deletions fill the table with deleted entry markers.
+
+	This means that a table that was filled, then emptied, will have
+	performance for unsuccessful searches in O(hash->size)
+
+	The solution here is to decide when the table is too full of deleted
+	entries and recompute the data into a clean version of the hashtable.
+
+In addition to the core hash_table implementation, a copy of the FNV-1a 32-bit
+hash function is included for convenience for those that don't wish to analyze
+hash functions on their own.
