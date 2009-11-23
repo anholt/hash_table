@@ -24,6 +24,7 @@ LDADD = ../libhash_table.la
 TESTS = \
 	delete_and_lookup \
 	insert_and_lookup \
+	insert_many \
 	null_destroy \
 	$()
 
