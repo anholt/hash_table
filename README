@@ -40,6 +40,6 @@ Performance considerations:
 	The solution here is to decide when the table is too full of deleted
 	entries and recompute the data into a clean version of the hashtable.
 
-In addition to the core hash_table implementation, a copy of the FNV-1a 32-bit
-hash function is included for convenience for those that don't wish to analyze
-hash functions on their own.
+In addition to the core hash_table implementation, a sample of the FNV-1a
+32-bit hash function is included for convenience for those that don't wish
+to analyze hash functions on their own.

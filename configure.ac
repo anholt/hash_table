@@ -34,6 +34,8 @@ AM_INIT_AUTOMAKE([dist-bzip2])
 AC_PROG_LIBTOOL
 AC_PROG_CC
 
+# Enable quiet compiles on automake 1.11.
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 WARN_CFLAGS=""
 
@@ -47,4 +49,5 @@ AC_SUBST([WARN_CFLAGS])
 
 AC_OUTPUT([
 	Makefile
+	tests/Makefile
 ])

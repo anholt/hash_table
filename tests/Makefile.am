@@ -18,20 +18,12 @@
 #  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 #  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-AUTOMAKE_OPTIONS = foreign
+AM_CFLAGS = $(WARN_CFLAGS) -I..
+LDADD = ../libhash_table.la
 
-SUBDIRS = . tests
+TESTS = \
+	insert_and_lookup \
+	null_destroy \
+	$()
 
-AM_CFLAGS = $(WARN_CFLAGS)
-
-noinst_LTLIBRARIES = libhash_table.la
-
-libhash_table_la_SOURCES = \
-	fnv_hash.c \
-	fnv_hash.h \
-	hash_table.c \
-	hash_table.h
-
-EXTRA_DIST = \
-	COPYING \
-	README
+EXTRA_PROGRAMS = $(TESTS)
