@@ -57,3 +57,6 @@ void hash_table_remove(struct hash_table *ht, struct hash_entry *entry);
 
 struct hash_entry *hash_table_next_entry(struct hash_table *ht,
 					 struct hash_entry *entry);
+struct hash_entry *
+hash_table_random_entry(struct hash_table *ht,
+			int (*predicate)(struct hash_entry *entry));

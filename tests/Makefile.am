@@ -27,6 +27,7 @@ TESTS = \
 	insert_and_lookup \
 	insert_many \
 	null_destroy \
+	random_entry \
 	$()
 
 EXTRA_PROGRAMS = $(TESTS)

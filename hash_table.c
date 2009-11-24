@@ -271,3 +271,30 @@ hash_table_next_entry(struct hash_table *ht, struct hash_entry *entry)
 
 	return NULL;
 }
+
+struct hash_entry *
+hash_table_random_entry(struct hash_table *ht,
+			int (*predicate)(struct hash_entry *entry))
+{
+	struct hash_entry *entry;
+	uint32_t i = random() % ht->size;
+
+	if (ht->entries == 0)
+		return NULL;
+
+	for (entry = ht->table + i; entry != ht->table + ht->size; entry++) {
+		if (entry_is_present(entry) &&
+		    (!predicate || predicate(entry))) {
+			return entry;
+		}
+	}
+
+	for (entry = ht->table; entry != ht->table + i; entry++) {
+		if (entry_is_present(entry) &&
+		    (!predicate || predicate(entry))) {
+			return entry;
+		}
+	}
+
+	return NULL;
+}
