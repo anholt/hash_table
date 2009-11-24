@@ -83,7 +83,7 @@ main(int argc, char **argv)
 	}
 	assert(i != 100);
 
-	hash_table_destroy(NULL, NULL);
+	hash_table_destroy(ht, NULL);
 
 	return 0;
 }

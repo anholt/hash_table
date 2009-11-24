@@ -69,7 +69,7 @@ main(int argc, char **argv)
 	entry = hash_table_search(ht, hash_str2, str2);
 	assert(strcmp(entry->key, str2) == 0);
 
-	hash_table_destroy(NULL, NULL);
+	hash_table_destroy(ht, NULL);
 
 	return 0;
 }

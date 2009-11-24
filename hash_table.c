@@ -118,6 +118,7 @@ hash_table_create(int key_equals_function(const void *a,
 	ht->key_equals_function = key_equals_function;
 	ht->table = calloc(ht->size, sizeof(*ht->table));
 	ht->entries = 0;
+	ht->deleted_entries = 0;
 
 	if (ht->table == NULL) {
 		free(ht);
@@ -149,7 +150,7 @@ hash_table_destroy(struct hash_table *ht,
 			delete_function(entry);
 		}
 	}
-
+	free(ht->table);
 	free(ht);
 }
 

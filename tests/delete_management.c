@@ -82,7 +82,7 @@ main(int argc, char **argv)
 		       key_value(entry->key) < size);
 	}
 
-	hash_table_destroy(NULL, NULL);
+	hash_table_destroy(ht, NULL);
 
 	return 0;
 }
