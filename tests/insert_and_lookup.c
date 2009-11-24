@@ -37,17 +37,19 @@ main(int argc, char **argv)
 	struct hash_table *ht;
 	const char *str1 = "test1";
 	const char *str2 = "test2";
+	uint32_t hash_str1 = fnv1_hash_string(str1);
+	uint32_t hash_str2 = fnv1_hash_string(str2);
 	struct hash_entry *entry;
 
-	ht = hash_table_create(fnv1_hash_string, string_key_equals);
+	ht = hash_table_create(string_key_equals);
 
-	hash_table_insert(ht, str1, NULL);
-	hash_table_insert(ht, str2, NULL);
+	hash_table_insert(ht, hash_str1, str1, NULL);
+	hash_table_insert(ht, hash_str2, str2, NULL);
 
-	entry = hash_table_search(ht, str1);
+	entry = hash_table_search(ht, hash_str1, str1);
 	assert(strcmp(entry->key, str1) == 0);
 
-	entry = hash_table_search(ht, str2);
+	entry = hash_table_search(ht, hash_str2, str2);
 	assert(strcmp(entry->key, str2) == 0);
 
 	hash_table_destroy(NULL, NULL);

@@ -31,16 +31,6 @@
 #include "hash_table.h"
 #include "fnv_hash.h"
 
-static uint32_t
-uint32_t_key_hash(const void *key)
-{
-	/* Note that we're using the address of the key instead of the
-	 * perfectly-hashed 32-bit value in the key, in order to trigger
-	 * collisions.
-	 */
-	return (uint32_t)(uintptr_t)key;
-}
-
 static int
 uint32_t_key_equals(const void *a, const void *b)
 {
@@ -56,16 +46,16 @@ main(int argc, char **argv)
 	uint32_t keys[size];
 	uint32_t i;
 
-	ht = hash_table_create(uint32_t_key_hash, uint32_t_key_equals);
+	ht = hash_table_create(uint32_t_key_equals);
 
 	for (i = 0; i < size; i++) {
 		keys[i] = i;
 
-		hash_table_insert(ht, keys + i, NULL);
+		hash_table_insert(ht, i, keys + i, NULL);
 	}
 
 	for (i = 0; i < size; i++) {
-		entry = hash_table_search(ht, keys + i);
+		entry = hash_table_search(ht, i, keys + i);
 		assert(entry);
 		assert(*(uint32_t *)entry->key == i);
 	}

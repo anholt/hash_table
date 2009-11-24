@@ -96,8 +96,7 @@ entry_is_present(struct hash_entry *entry)
 }
 
 struct hash_table *
-hash_table_create(uint32_t (*hash_function)(const void *key),
-		  int key_equals_function(const void *a,
+hash_table_create(int key_equals_function(const void *a,
 					  const void *b))
 {
 	struct hash_table *ht;
@@ -110,7 +109,6 @@ hash_table_create(uint32_t (*hash_function)(const void *key),
 	ht->size = hash_sizes[ht->size_index].size;
 	ht->rehash = hash_sizes[ht->size_index].rehash;
 	ht->max_entries = hash_sizes[ht->size_index].max_entries;
-	ht->hash_function = hash_function;
 	ht->key_equals_function = key_equals_function;
 	ht->table = calloc(ht->size, sizeof(*ht->table));
 	ht->entries = 0;
@@ -150,11 +148,10 @@ hash_table_destroy(struct hash_table *ht,
 }
 
 struct hash_entry *
-hash_table_search(struct hash_table *ht, const void *key)
+hash_table_search(struct hash_table *ht, uint32_t hash, const void *key)
 {
-	uint32_t hash, hash_address;
+	uint32_t hash_address;
 
-	hash = ht->hash_function(key);
 	hash_address = hash % ht->size;
 	do {
 		struct hash_entry *entry = ht->table + hash_address;
@@ -198,7 +195,8 @@ hash_table_expand(struct hash_table *ht)
 	     entry != old_ht.table + old_ht.size;
 	     entry++) {
 		if (entry_is_present(entry)) {
-			hash_table_insert(ht, entry->key, entry->data);
+			hash_table_insert(ht, entry->hash,
+					  entry->key, entry->data);
 		}
 	}
 
@@ -206,15 +204,15 @@ hash_table_expand(struct hash_table *ht)
 }
 
 struct hash_entry *
-hash_table_insert(struct hash_table *ht, const void *key, void *data)
+hash_table_insert(struct hash_table *ht, uint32_t hash,
+		  const void *key, void *data)
 {
-	uint32_t hash, hash_address;
+	uint32_t hash_address;
 
 	if (ht->entries >= ht->max_entries) {
 		hash_table_expand(ht);
 	}
 
-	hash = ht->hash_function(key);
 	hash_address = hash % ht->size;
 	do {
 		struct hash_entry *entry = ht->table + hash_address;

@@ -51,11 +51,13 @@ int
 main(int argc, char **argv)
 {
 	struct hash_table *ht;
+	uint32_t hash_str1 = fnv1_hash_string(str1);
+	uint32_t hash_str2 = fnv1_hash_string(str2);
 
-	ht = hash_table_create(fnv1_hash_string, string_key_equals);
+	ht = hash_table_create(string_key_equals);
 
-	hash_table_insert(ht, str1, NULL);
-	hash_table_insert(ht, str2, NULL);
+	hash_table_insert(ht, hash_str1, str1, NULL);
+	hash_table_insert(ht, hash_str2, str2, NULL);
 
 	hash_table_destroy(ht, delete_callback);
 

@@ -44,15 +44,15 @@ struct hash_table {
 	uint32_t entries;
 };
 
-struct hash_table *hash_table_create(uint32_t (*hash_function)(const void *key),
-				     int (*key_equals_function)(const void *a,
+struct hash_table *hash_table_create(int (*key_equals_function)(const void *a,
 								const void *b));
 void hash_table_destroy(struct hash_table *ht,
 			void (*delete_function)(struct hash_entry *entry));
 
-struct hash_entry *hash_table_insert(struct hash_table *ht, const void *key,
-				     void *data);
-struct hash_entry *hash_table_search(struct hash_table *ht, const void *key);
+struct hash_entry *hash_table_insert(struct hash_table *ht, uint32_t hash,
+				     const void *key, void *data);
+struct hash_entry *hash_table_search(struct hash_table *ht, uint32_t hash,
+				     const void *key);
 void hash_table_remove(struct hash_table *ht, struct hash_entry *entry);
 
 struct hash_entry *hash_table_next_entry(struct hash_table *ht,
