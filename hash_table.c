@@ -90,6 +90,12 @@ entry_is_free(struct hash_entry *entry)
 }
 
 static int
+entry_is_deleted(struct hash_entry *entry)
+{
+	return entry->key == deleted_key;
+}
+
+static int
 entry_is_present(struct hash_entry *entry)
 {
 	return entry->key != NULL && entry->key != deleted_key;
@@ -147,6 +153,12 @@ hash_table_destroy(struct hash_table *ht,
 	free(ht);
 }
 
+/**
+ * Finds a hash table entry with the given key and hash of that key.
+ *
+ * Returns NULL if no entry is found.  Note that the data pointer may be
+ * modified by the user.
+ */
 struct hash_entry *
 hash_table_search(struct hash_table *ht, uint32_t hash, const void *key)
 {
@@ -171,25 +183,26 @@ hash_table_search(struct hash_table *ht, uint32_t hash, const void *key)
 }
 
 static void
-hash_table_expand(struct hash_table *ht)
+hash_table_rehash(struct hash_table *ht, int new_size_index)
 {
 	struct hash_table old_ht;
 	struct hash_entry *table, *entry;
 
-	if (ht->size_index + 1 == ARRAY_SIZE(hash_sizes))
+	if (new_size_index >= ARRAY_SIZE(hash_sizes))
 		return;
 
-	table = calloc(hash_sizes[ht->size_index + 1].size, sizeof(*ht->table));
+	table = calloc(hash_sizes[new_size_index].size, sizeof(*ht->table));
 	if (table == NULL)
 		return;
 
 	old_ht = *ht;
 
 	ht->table = table;
-	ht->size_index++;
+	ht->size_index = new_size_index;
 	ht->size = hash_sizes[ht->size_index].size;
 	ht->rehash = hash_sizes[ht->size_index].rehash;
 	ht->max_entries = hash_sizes[ht->size_index].max_entries;
+	ht->deleted_entries = 0;
 
 	for (entry = old_ht.table;
 	     entry != old_ht.table + old_ht.size;
@@ -203,6 +216,12 @@ hash_table_expand(struct hash_table *ht)
 	free(old_ht.table);
 }
 
+/**
+ * Inserts the key with the given hash into the table.
+ *
+ * Note that insertion may rearrange the table on a resize or rehash,
+ * so previously found hash_entries are no longer valid after this function.
+ */
 struct hash_entry *
 hash_table_insert(struct hash_table *ht, uint32_t hash,
 		  const void *key, void *data)
@@ -210,7 +229,9 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 	uint32_t hash_address;
 
 	if (ht->entries >= ht->max_entries) {
-		hash_table_expand(ht);
+		hash_table_rehash(ht, ht->size_index + 1);
+	} else if (ht->deleted_entries + ht->entries >= ht->max_entries) {
+		hash_table_rehash(ht, ht->size_index);
 	}
 
 	hash_address = hash % ht->size;
@@ -218,6 +239,8 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 		struct hash_entry *entry = ht->table + hash_address;
 
 		if (!entry_is_present(entry)) {
+			if (entry_is_deleted(entry))
+				ht->deleted_entries--;
 			entry->hash = hash;
 			entry->key = key;
 			entry->data = data;
@@ -245,6 +268,7 @@ hash_table_remove(struct hash_table *ht, struct hash_entry *entry)
 {
 	entry->key = deleted_key;
 	ht->entries--;
+	ht->deleted_entries++;
 }
 
 /**

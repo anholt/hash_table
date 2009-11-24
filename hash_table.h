@@ -35,13 +35,13 @@ struct hash_entry {
 
 struct hash_table {
 	struct hash_entry *table;
-	uint32_t (*hash_function)(const void *key);
 	int (*key_equals_function)(const void *a, const void *b);
 	uint32_t size;
 	uint32_t rehash;
 	uint32_t max_entries;
 	uint32_t size_index;
 	uint32_t entries;
+	uint32_t deleted_entries;
 };
 
 struct hash_table *hash_table_create(int (*key_equals_function)(const void *a,
