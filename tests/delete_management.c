@@ -43,12 +43,6 @@ uint32_t_key_equals(const void *a, const void *b)
 	return key_value(a) == key_value(b);
 }
 
-static int
-uint32_t_key_is_even(struct hash_entry *entry)
-{
-	return (key_value(entry->key) & 1) == 0;
-}
-
 int
 main(int argc, char **argv)
 {
@@ -56,7 +50,7 @@ main(int argc, char **argv)
 	struct hash_entry *entry;
 	int size = 10000;
 	uint32_t keys[size];
-	uint32_t i, random_value;
+	uint32_t i;
 
 	ht = hash_table_create(uint32_t_key_equals);
 
@@ -64,24 +58,29 @@ main(int argc, char **argv)
 		keys[i] = i;
 
 		hash_table_insert(ht, i, keys + i, NULL);
+
+		if (i >= 100) {
+			uint32_t delete_value = i - 100;
+			entry = hash_table_search(ht, delete_value,
+						  &delete_value);
+			hash_table_remove(ht, entry);
+		}
 	}
 
-	/* Test the no-predicate case. */
-	entry = hash_table_random_entry(ht, NULL);
-	assert(entry);
-
-	/* Check that we're getting different entries and that the predicate
-	 * works.
-	 */
-	for (i = 0; i < 100; i++) {
-		entry = hash_table_random_entry(ht, uint32_t_key_is_even);
+	/* Make sure that all our entries were present at the end. */
+	for (i = size - 100; i < size; i++) {
+		entry = hash_table_search(ht, i, keys + i);
 		assert(entry);
-		assert((key_value(entry->key) & 1) == 0);
-		if (i == 0 || key_value(entry->key) != random_value)
-			break;
-		random_value = key_value(entry->key);
+		assert(key_value(entry->key) == i);
 	}
-	assert(i != 100);
+
+	/* Make sure that no extra entries got in */
+	for (entry = hash_table_next_entry(ht, NULL);
+	     entry != NULL;
+	     entry = hash_table_next_entry(ht, entry)) {
+		assert(key_value(entry->key) >= size - 100 &&
+		       key_value(entry->key) < size);
+	}
 
 	hash_table_destroy(NULL, NULL);
 

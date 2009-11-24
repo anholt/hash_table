@@ -23,6 +23,7 @@ LDADD = ../libhash_table.la
 
 TESTS = \
 	delete_and_lookup \
+	delete_management \
 	destroy_callback \
 	insert_and_lookup \
 	insert_many \

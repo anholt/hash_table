@@ -31,10 +31,16 @@
 #include "hash_table.h"
 #include "fnv_hash.h"
 
+static uint32_t
+key_value(const void *key)
+{
+	return *(const uint32_t *)key;
+}
+
 static int
 uint32_t_key_equals(const void *a, const void *b)
 {
-	return *(uint32_t *)a == *(uint32_t *)b;
+	return key_value(a) == key_value(b);
 }
 
 int
@@ -57,7 +63,7 @@ main(int argc, char **argv)
 	for (i = 0; i < size; i++) {
 		entry = hash_table_search(ht, i, keys + i);
 		assert(entry);
-		assert(*(uint32_t *)entry->key == i);
+		assert(key_value(entry->key) == i);
 	}
 
 	hash_table_destroy(NULL, NULL);

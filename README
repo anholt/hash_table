@@ -24,11 +24,11 @@ When deleting an entry, the entry is marked deleted.
 
 Performance considerations:
 
- * Only an extra 10% free is given.
+ * Only an extra 10% free entries is given at any table size.
 
 	This means that as entries are added, the performance of insertion and
 	lookups will degrade as one approaches maximum entries until the table
-	gets resized.  Unless an outside entry management results in a maximum
+	gets resized.  Unless an outside entry manager results in a maximum
 	number of entries close to the hash table's current size limit, this
 	shouldn't be a concern.
 
@@ -39,6 +39,12 @@ Performance considerations:
 
 	The solution here is to decide when the table is too full of deleted
 	entries and recompute the data into a clean version of the hashtable.
+
+ * The data pointer increases space consumption for the hash table by around
+   50%
+
+	For some applications, such as tracking a set, the data pointer can
+	be removed from the interface and code relatively easily.
 
 In addition to the core hash_table implementation, a sample of the FNV-1a
 32-bit hash function is included for convenience for those that don't wish
