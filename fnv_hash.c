@@ -42,8 +42,8 @@ fnv1_hash_string(const void *key)
 	const unsigned char *str = key;
 
 	while (*str != 0) {
-		hash = hash * 0x01000193;
 		hash ^= *str;
+		hash = hash * 0x01000193;
 		str++;
 	}
 
