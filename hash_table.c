@@ -169,6 +169,8 @@ hash_table_search(struct hash_table *ht, uint32_t hash, const void *key)
 
 	hash_address = hash % ht->size;
 	do {
+		uint32_t double_hash;
+
 		struct hash_entry *entry = ht->table + hash_address;
 
 		if (entry_is_free(entry)) {
@@ -179,7 +181,11 @@ hash_table_search(struct hash_table *ht, uint32_t hash, const void *key)
 			}
 		}
 
-		hash_address = (hash_address + ht->rehash) % ht->size;
+		double_hash = hash % ht->rehash;
+		if (double_hash == 0)
+			double_hash = 1;
+
+		hash_address = (hash_address + double_hash) % ht->size;
 	} while (hash_address != hash % ht->size);
 
 	return NULL;
@@ -241,6 +247,7 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 	hash_address = hash % ht->size;
 	do {
 		struct hash_entry *entry = ht->table + hash_address;
+		uint32_t double_hash;
 
 		if (!entry_is_present(entry)) {
 			if (entry_is_deleted(entry))
@@ -252,7 +259,11 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 			return entry;
 		}
 
-		hash_address = (hash_address + ht->rehash) % ht->size;
+		double_hash = hash % ht->rehash;
+		if (double_hash == 0)
+			double_hash = 1;
+
+		hash_address = (hash_address + double_hash) % ht->size;
 	} while (hash_address != hash % ht->size);
 
 	/* We could hit here if a required resize failed. An unchecked-malloc
