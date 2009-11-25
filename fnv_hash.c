@@ -38,7 +38,7 @@
 uint32_t
 fnv1_hash_string(const void *key)
 {
-	uint32_t hash = 0;
+	uint32_t hash = 2166136261ul;
 	const unsigned char *str = key;
 
 	while (*str != 0) {
