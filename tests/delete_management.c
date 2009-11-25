@@ -81,6 +81,7 @@ main(int argc, char **argv)
 		assert(key_value(entry->key) >= size - 100 &&
 		       key_value(entry->key) < size);
 	}
+	assert(ht->entries == 100);
 
 	hash_table_destroy(ht, NULL);
 

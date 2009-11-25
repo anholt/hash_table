@@ -65,6 +65,7 @@ main(int argc, char **argv)
 		assert(entry);
 		assert(key_value(entry->key) == i);
 	}
+	assert(ht->entries == size);
 
 	hash_table_destroy(ht, NULL);
 

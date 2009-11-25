@@ -205,6 +205,7 @@ hash_table_rehash(struct hash_table *ht, int new_size_index)
 	ht->size = hash_sizes[ht->size_index].size;
 	ht->rehash = hash_sizes[ht->size_index].rehash;
 	ht->max_entries = hash_sizes[ht->size_index].max_entries;
+	ht->entries = 0;
 	ht->deleted_entries = 0;
 
 	for (entry = old_ht.table;
