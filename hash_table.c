@@ -147,7 +147,9 @@ hash_table_destroy(struct hash_table *ht,
 		for (entry = ht->table;
 		     entry != NULL;
 		     entry = hash_table_next_entry(ht, entry)) {
-			delete_function(entry);
+			if (entry_is_present(entry)) {
+				delete_function(entry);
+			}
 		}
 	}
 	free(ht->table);
