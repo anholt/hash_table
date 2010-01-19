@@ -144,12 +144,10 @@ hash_table_destroy(struct hash_table *ht,
 	if (delete_function) {
 		struct hash_entry *entry;
 
-		for (entry = ht->table;
+		for (entry = hash_table_next_entry(ht, NULL);
 		     entry != NULL;
 		     entry = hash_table_next_entry(ht, entry)) {
-			if (entry_is_present(entry)) {
-				delete_function(entry);
-			}
+			delete_function(entry);
 		}
 	}
 	free(ht->table);
