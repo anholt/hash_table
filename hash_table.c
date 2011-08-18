@@ -255,6 +255,25 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 			return entry;
 		}
 
+		/* Implement replacement when another insert happens
+		 * with a matching key.  This is a relatively common
+		 * feature of hash tables, with the alternative
+		 * generally being "insert the new value as well, and
+		 * return it first when the key is searched for".
+		 *
+		 * Note that the hash table doesn't have a delete
+		 * callback.  If freeing of old data pointers is
+		 * required to avoid memory leaks, perform a search
+		 * before inserting.
+		 */
+		if (entry->hash == hash &&
+		    ht->key_equals_function(key, entry->key)) {
+			entry->key = key;
+			entry->data = data;
+			return entry;
+		}
+
+
 		double_hash = 1 + hash % ht->rehash;
 
 		hash_address = (hash_address + double_hash) % ht->size;

@@ -13,8 +13,10 @@ with rehashing.  The table stores for each entry:
  * pointer to the data.
 
 Inserts occur at key->hash % hash->size.  When an insert collides, the insert
-reattempts at (key->hash % hash->size + hash->reprobe) % hash->size, and
-onwards at increments of reprobe until a free or dead entry is found.
+steps through the table using the reprobe stride until a free or dead entry is
+found.  When an insert occurs with a key matching a key already in the table,
+the new data is associated with the key.  Note that old key/data is not freed,
+so if memory management is required, do a search before insert.
 
 When searching, the search starts at key % hash_size and continues at
 increments of reprobe as with inserts, until the matching entry or an
