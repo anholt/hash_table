@@ -179,9 +179,7 @@ hash_table_search(struct hash_table *ht, uint32_t hash, const void *key)
 			}
 		}
 
-		double_hash = hash % ht->rehash;
-		if (double_hash == 0)
-			double_hash = 1;
+		double_hash = 1 + hash % ht->rehash;
 
 		hash_address = (hash_address + double_hash) % ht->size;
 	} while (hash_address != hash % ht->size);
@@ -257,9 +255,7 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 			return entry;
 		}
 
-		double_hash = hash % ht->rehash;
-		if (double_hash == 0)
-			double_hash = 1;
+		double_hash = 1 + hash % ht->rehash;
 
 		hash_address = (hash_address + double_hash) % ht->size;
 	} while (hash_address != hash % ht->size);
