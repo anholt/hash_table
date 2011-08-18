@@ -294,6 +294,9 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 void
 hash_table_remove(struct hash_table *ht, struct hash_entry *entry)
 {
+	if (!entry)
+		return;
+
 	entry->key = deleted_key;
 	ht->entries--;
 	ht->deleted_entries++;

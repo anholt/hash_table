@@ -29,6 +29,7 @@ TESTS = \
 	insert_many \
 	null_destroy \
 	random_entry \
+	remove_null \
 	replacement \
 	$()
 
