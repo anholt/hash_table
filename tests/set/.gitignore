@@ -1,0 +1,9 @@
+delete_and_lookup
+delete_management
+destroy_callback
+insert_and_lookup
+insert_many
+null_destroy
+null_remove
+random_entry
+replacement

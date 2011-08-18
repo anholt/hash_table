@@ -50,4 +50,5 @@ AC_SUBST([WARN_CFLAGS])
 AC_OUTPUT([
 	Makefile
 	tests/Makefile
+	tests/set/Makefile
 ])

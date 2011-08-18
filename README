@@ -2,6 +2,9 @@ This is a simple hash table implementation written in plain old C.  The goal
 is for this code to be reusable in many of the projects I've worked on that
 could use something better than a poorly-tuned chaining implementation.
 
+A variant is included which is just a set -- hash and key, not hash, key, and
+data.
+
 The intention is that users of this code copy it directly into their
 repositories, as it's quite small and should see very little development.
 
@@ -41,12 +44,6 @@ Performance considerations:
 
 	This is worked around in practice by later inserts into a hash table
 	with many deletes in it triggering a rehash at the current size.
-
- * The data pointer increases space consumption for the hash table by around
-   50%
-
-	For some applications, such as tracking a set, the data pointer can
-	be removed from the interface and code relatively easily.
 
 In addition to the core hash_table implementation, a sample of the FNV-1a
 32-bit hash function is included for convenience for those that don't wish
