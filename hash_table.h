@@ -25,6 +25,10 @@
  *
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <inttypes.h>
 
 struct hash_entry {
@@ -70,3 +74,7 @@ hash_table_random_entry(struct hash_table *ht,
 	for (entry = hash_table_next_entry(ht, NULL);		\
 	     entry != NULL;					\
 	     entry = hash_table_next_entry(ht, entry))
+
+#ifdef __cplusplus
+} /* extern C */
+#endif

@@ -209,10 +209,7 @@ hash_table_rehash(struct hash_table *ht, int new_size_index)
 	ht->deleted_entries = 0;
 
 	hash_table_foreach(&old_ht, entry) {
-		if (entry_is_present(entry)) {
-			hash_table_insert(ht, entry->hash,
-					  entry->key, entry->data);
-		}
+		hash_table_insert(ht, entry->hash, entry->key, entry->data);
 	}
 
 	free(old_ht.table);
