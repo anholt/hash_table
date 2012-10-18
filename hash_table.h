@@ -60,3 +60,13 @@ struct hash_entry *hash_table_next_entry(struct hash_table *ht,
 struct hash_entry *
 hash_table_random_entry(struct hash_table *ht,
 			int (*predicate)(struct hash_entry *entry));
+
+/**
+ * This foreach function is safe against deletion (which just replaces
+ * an entry's data with the deleted marker), but not against insertion
+ * (which may rehash the table, making entry a dangling pointer).
+ */
+#define hash_table_foreach(ht, entry)				\
+	for (entry = hash_table_next_entry(ht, NULL);		\
+	     entry != NULL;					\
+	     entry = hash_table_next_entry(ht, entry))

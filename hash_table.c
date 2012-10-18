@@ -144,9 +144,7 @@ hash_table_destroy(struct hash_table *ht,
 	if (delete_function) {
 		struct hash_entry *entry;
 
-		for (entry = hash_table_next_entry(ht, NULL);
-		     entry != NULL;
-		     entry = hash_table_next_entry(ht, entry)) {
+		hash_table_foreach(ht, entry) {
 			delete_function(entry);
 		}
 	}
@@ -210,9 +208,7 @@ hash_table_rehash(struct hash_table *ht, int new_size_index)
 	ht->entries = 0;
 	ht->deleted_entries = 0;
 
-	for (entry = old_ht.table;
-	     entry != old_ht.table + old_ht.size;
-	     entry++) {
+	hash_table_foreach(&old_ht, entry) {
 		if (entry_is_present(entry)) {
 			hash_table_insert(ht, entry->hash,
 					  entry->key, entry->data);
