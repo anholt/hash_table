@@ -24,6 +24,7 @@ AM_CFLAGS = $(WARN_CFLAGS) -I..
 LDADD = ../libhash_table.la
 
 TESTS = \
+	collision \
 	delete_and_lookup \
 	delete_management \
 	destroy_callback \
