@@ -84,19 +84,19 @@ static const struct {
 };
 
 static int
-entry_is_free(struct set_entry *entry)
+entry_is_free(const struct set_entry *entry)
 {
 	return entry->key == NULL;
 }
 
 static int
-entry_is_deleted(struct set_entry *entry)
+entry_is_deleted(const struct set_entry *entry)
 {
 	return entry->key == deleted_key;
 }
 
 static int
-entry_is_present(struct set_entry *entry)
+entry_is_present(const struct set_entry *entry)
 {
 	return entry->key != NULL && entry->key != deleted_key;
 }
