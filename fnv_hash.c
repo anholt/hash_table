@@ -36,15 +36,15 @@
 #include "fnv_hash.h"
 
 uint32_t
-fnv1_hash_string(const void *key)
+fnv1_hash_string(const char *key)
 {
 	uint32_t hash = 2166136261ul;
-	const unsigned char *str = key;
+	const uint8_t *bytes = (uint8_t *)key;
 
-	while (*str != 0) {
-		hash ^= *str;
+	while (*bytes != 0) {
+		hash ^= *bytes;
 		hash = hash * 0x01000193;
-		str++;
+		bytes++;
 	}
 
 	return hash;
