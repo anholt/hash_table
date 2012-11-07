@@ -319,6 +319,14 @@ hash_table_next_entry(struct hash_table *ht, struct hash_entry *entry)
 	return NULL;
 }
 
+/**
+ * Returns a random entry from the hash table.
+ *
+ * This may be useful in implementing random replacement (as opposed
+ * to just removing everything) in caches based on this hash table
+ * implementation.  @predicate may be used to filter entries, or may
+ * be set to NULL for no filtering.
+ */
 struct hash_entry *
 hash_table_random_entry(struct hash_table *ht,
 			int (*predicate)(struct hash_entry *entry))
