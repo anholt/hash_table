@@ -161,9 +161,9 @@ hash_table_destroy(struct hash_table *ht,
 struct hash_entry *
 hash_table_search(struct hash_table *ht, uint32_t hash, const void *key)
 {
-	uint32_t hash_address;
+	uint32_t start_hash_address = hash % ht->size;
+	uint32_t hash_address = start_hash_address;
 
-	hash_address = hash % ht->size;
 	do {
 		uint32_t double_hash;
 
@@ -180,7 +180,7 @@ hash_table_search(struct hash_table *ht, uint32_t hash, const void *key)
 		double_hash = 1 + hash % ht->rehash;
 
 		hash_address = (hash_address + double_hash) % ht->size;
-	} while (hash_address != hash % ht->size);
+	} while (hash_address != start_hash_address);
 
 	return NULL;
 }
@@ -225,7 +225,7 @@ struct hash_entry *
 hash_table_insert(struct hash_table *ht, uint32_t hash,
 		  const void *key, void *data)
 {
-	uint32_t hash_address;
+	uint32_t start_hash_address, hash_address;
 
 	if (ht->entries >= ht->max_entries) {
 		hash_table_rehash(ht, ht->size_index + 1);
@@ -233,7 +233,8 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 		hash_table_rehash(ht, ht->size_index);
 	}
 
-	hash_address = hash % ht->size;
+	start_hash_address = hash % ht->size;
+	hash_address = start_hash_address;
 	do {
 		struct hash_entry *entry = ht->table + hash_address;
 		uint32_t double_hash;
@@ -270,7 +271,7 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 		double_hash = 1 + hash % ht->rehash;
 
 		hash_address = (hash_address + double_hash) % ht->size;
-	} while (hash_address != hash % ht->size);
+	} while (hash_address != start_hash_address);
 
 	/* We could hit here if a required resize failed. An unchecked-malloc
 	 * application could ignore this result.
