@@ -25,6 +25,9 @@
  *
  */
 
+#ifndef SET_H
+#define SET_H
+
 #include <inttypes.h>
 
 struct set_entry {
@@ -65,3 +68,5 @@ set_next_entry(struct set *set, struct set_entry *entry);
 struct set_entry *
 set_random_entry(struct set *set,
 		 int (*predicate)(struct set_entry *entry));
+
+#endif

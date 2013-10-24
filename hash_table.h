@@ -25,6 +25,9 @@
  *
  */
 
+#ifndef HASH_TABLE_H
+#define HASH_TABLE_H
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -86,4 +89,6 @@ hash_table_random_entry(struct hash_table *ht,
 
 #ifdef __cplusplus
 } /* extern C */
+#endif
+
 #endif
