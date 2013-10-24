@@ -51,4 +51,5 @@ AC_OUTPUT([
 	Makefile
 	tests/Makefile
 	tests/set/Makefile
+	tests/int-set/Makefile
 ])

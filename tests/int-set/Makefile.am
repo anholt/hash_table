@@ -19,33 +19,18 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 #  IN THE SOFTWARE.
 
-AUTOMAKE_OPTIONS = foreign
+AM_CFLAGS = $(WARN_CFLAGS) -I../..
+LDADD = ../../libint-set.la
 
-SUBDIRS = . tests
+TESTS = \
+	delete_and_lookup \
+	delete_management \
+	insert_and_lookup \
+	insert_many \
+	null_destroy \
+	null_remove \
+	random_entry \
+	replacement \
+	$()
 
-AM_CFLAGS = $(WARN_CFLAGS)
-
-noinst_LTLIBRARIES = \
-	libhash_table.la \
-	libint-set.la \
-	libset.la
-
-libhash_table_la_SOURCES = \
-	fnv_hash.c \
-	fnv_hash.h \
-	hash_table.c \
-	hash_table.h
-
-libint_set_la_SOURCES = \
-	int-set.c \
-	int-set.h
-
-libset_la_SOURCES = \
-	fnv_hash.c \
-	fnv_hash.h \
-	set.c \
-	set.h
-
-EXTRA_DIST = \
-	COPYING \
-	README
+EXTRA_PROGRAMS = $(TESTS)
