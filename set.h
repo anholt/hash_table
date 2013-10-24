@@ -43,18 +43,25 @@ struct set {
 	uint32_t deleted_entries;
 };
 
-struct set *set_create(int (*key_equals_function)(const void *a,
-						  const void *b));
-void set_destroy(struct set *set,
-		 void (*delete_function)(struct set_entry *entry));
+struct set *
+set_create(int (*key_equals_function)(const void *a,
+				       const void *b));
+void
+set_destroy(struct set *set,
+	    void (*delete_function)(struct set_entry *entry));
 
-struct set_entry *set_add(struct set *set, uint32_t hash, const void *key);
-struct set_entry *set_search(struct set *set, uint32_t hash,
-			     const void *key);
-void set_remove(struct set *set, struct set_entry *entry);
+struct set_entry *
+set_add(struct set *set, uint32_t hash, const void *key);
 
-struct set_entry *set_next_entry(struct set *set,
-				 struct set_entry *entry);
+struct set_entry *
+set_search(struct set *set, uint32_t hash, const void *key);
+
+void
+set_remove(struct set *set, struct set_entry *entry);
+
+struct set_entry *
+set_next_entry(struct set *set, struct set_entry *entry);
+
 struct set_entry *
 set_random_entry(struct set *set,
 		 int (*predicate)(struct set_entry *entry));
