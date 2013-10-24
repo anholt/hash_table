@@ -1,3 +1,6 @@
+*.log
+*.trs
+collision
 delete_and_lookup
 delete_management
 destroy_callback
