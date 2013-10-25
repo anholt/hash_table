@@ -46,14 +46,20 @@ main(int argc, char **argv)
 	struct hash_table *ht;
 	const char *str1 = "test1";
 	const char *str2 = "test2";
+	const char *str3 = "test3";
 	uint32_t hash_str1 = badhash(str1);
 	uint32_t hash_str2 = badhash(str2);
+	uint32_t hash_str3 = badhash(str3);
 	struct hash_entry *entry;
 
 	ht = hash_table_create(string_key_equals);
 
 	hash_table_insert(ht, hash_str1, str1, NULL);
 	hash_table_insert(ht, hash_str2, str2, NULL);
+	hash_table_insert(ht, hash_str3, str3, NULL);
+
+	entry = hash_table_search(ht, hash_str3, str3);
+	assert(strcmp(entry->key, str3) == 0);
 
 	entry = hash_table_search(ht, hash_str2, str2);
 	assert(strcmp(entry->key, str2) == 0);
@@ -61,13 +67,17 @@ main(int argc, char **argv)
 	entry = hash_table_search(ht, hash_str1, str1);
 	assert(strcmp(entry->key, str1) == 0);
 
-	hash_table_remove(ht, entry);
+	hash_table_remove_entry(ht, entry);
+	hash_table_remove(ht, hash_str2, str2);
 
 	entry = hash_table_search(ht, hash_str1, str1);
 	assert(entry == NULL);
 
 	entry = hash_table_search(ht, hash_str2, str2);
-	assert(strcmp(entry->key, str2) == 0);
+	assert(entry == NULL);
+
+	entry = hash_table_search(ht, hash_str3, str3);
+	assert(strcmp(entry->key, str3) == 0);
 
 	hash_table_destroy(ht, NULL);
 

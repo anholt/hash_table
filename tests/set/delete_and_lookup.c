@@ -46,14 +46,20 @@ main(int argc, char **argv)
 	struct set *set;
 	const char *str1 = "test1";
 	const char *str2 = "test2";
+	const char *str3 = "test3";
 	uint32_t hash_str1 = badhash(str1);
 	uint32_t hash_str2 = badhash(str2);
+	uint32_t hash_str3 = badhash(str3);
 	struct set_entry *entry;
 
 	set = set_create(string_key_equals);
 
 	set_add(set, hash_str1, str1);
 	set_add(set, hash_str2, str2);
+	set_add(set, hash_str2, str3);
+
+	entry = set_search(set, hash_str3, str3);
+	assert(strcmp(entry->key, str3) == 0);
 
 	entry = set_search(set, hash_str2, str2);
 	assert(strcmp(entry->key, str2) == 0);
@@ -61,13 +67,17 @@ main(int argc, char **argv)
 	entry = set_search(set, hash_str1, str1);
 	assert(strcmp(entry->key, str1) == 0);
 
-	set_remove(set, entry);
+	set_remove_entry(set, entry);
+	set_remove(set, hash_str2, str2);
 
 	entry = set_search(set, hash_str1, str1);
 	assert(entry == NULL);
 
 	entry = set_search(set, hash_str2, str2);
-	assert(strcmp(entry->key, str2) == 0);
+	assert(entry == NULL);
+
+	entry = set_search(set, hash_str3, str3);
+	assert(strcmp(entry->key, str3) == 0);
 
 	set_destroy(set, NULL);
 

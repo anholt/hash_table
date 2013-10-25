@@ -61,8 +61,7 @@ main(int argc, char **argv)
 
 		if (i >= 100) {
 			uint32_t delete_value = i - 100;
-			entry = set_search(set, delete_value, &delete_value);
-			set_remove(set, entry);
+			set_remove(set, delete_value, &delete_value);
 		}
 	}
 

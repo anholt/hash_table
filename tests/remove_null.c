@@ -38,7 +38,7 @@ main(int argc, char **argv)
 
 	ht = hash_table_create(string_key_equals);
 
-	hash_table_remove(ht, NULL);
+	hash_table_remove_entry(ht, NULL);
 
 	hash_table_destroy(ht, NULL);
 

@@ -61,9 +61,7 @@ main(int argc, char **argv)
 
 		if (i >= 100) {
 			uint32_t delete_value = i - 100;
-			entry = hash_table_search(ht, delete_value,
-						  &delete_value);
-			hash_table_remove(ht, entry);
+			hash_table_remove(ht, delete_value, &delete_value);
 		}
 	}
 

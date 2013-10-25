@@ -57,7 +57,7 @@ main(int argc, char **argv)
 	assert(entry1->key == str1);
 
 	/* Remove the collided entry and look again. */
-	hash_table_remove(ht, entry1);
+	hash_table_remove_entry(ht, entry1);
 	entry2 = hash_table_search(ht, bad_hash, str2);
 	assert(entry2->key == str2);
 

@@ -50,7 +50,7 @@ main(int argc, char **argv)
 	assert(entry);
 	assert(entry->data == str2);
 
-	hash_table_remove(ht, entry);
+	hash_table_remove_entry(ht, entry);
 
 	entry = hash_table_search(ht, hash_str1, str1);
 	assert(!entry);

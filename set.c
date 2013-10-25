@@ -279,13 +279,30 @@ set_add(struct set *ht, uint32_t hash, const void *key)
 }
 
 /**
+ * This function searches for, and removes an entry from the set.
+ *
+ * If the caller has previously found a struct set_entry pointer,
+ * (from calling set_search or remembering it from set_add), then
+ * set_remove_entry can be called instead to avoid an extra search.
+ */
+void
+set_remove(struct set *set, uint32_t hash, const void *key)
+{
+	struct set_entry *entry;
+
+	entry = set_search(set, hash, key);
+
+	set_remove_entry(set, entry);
+}
+
+/**
  * This function deletes the given hash table entry.
  *
  * Note that deletion doesn't otherwise modify the table, so an iteration over
  * the table deleting entries is safe.
  */
 void
-set_remove(struct set *ht, struct set_entry *entry)
+set_remove_entry(struct set *ht, struct set_entry *entry)
 {
 	if (!entry)
 		return;

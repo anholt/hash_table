@@ -38,7 +38,7 @@ main(int argc, char **argv)
 
 	set = set_create(string_key_equals);
 
-	set_remove(set, NULL);
+	set_remove_entry(set, NULL);
 
 	set_destroy(set, NULL);
 

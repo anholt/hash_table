@@ -50,7 +50,7 @@ main(int argc, char **argv)
 	assert(entry);
 	assert(entry->key == str2);
 
-	set_remove(set, entry);
+	set_remove_entry(set, entry);
 
 	entry = set_search(set, hash_str1, str1);
 	assert(!entry);

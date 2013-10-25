@@ -280,13 +280,31 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
 }
 
 /**
+ * This function searches for, and removes an entry from the hash table.
+ *
+ * If the caller has previously found a struct hash_entry pointer,
+ * (from calling hash_table_search or remembering it from
+ * hash_table_insert), then hash_table_remove_entry can be called
+ * instead to avoid an extra search.
+ */
+void
+hash_table_remove(struct hash_table *ht, uint32_t hash, const void *key)
+{
+	struct hash_entry *entry;
+
+	entry = hash_table_search(ht, hash, key);
+
+	hash_table_remove_entry(ht, entry);
+}
+
+/**
  * This function deletes the given hash table entry.
  *
  * Note that deletion doesn't otherwise modify the table, so an iteration over
  * the table deleting entries is safe.
  */
 void
-hash_table_remove(struct hash_table *ht, struct hash_entry *entry)
+hash_table_remove_entry(struct hash_table *ht, struct hash_entry *entry)
 {
 	if (!entry)
 		return;

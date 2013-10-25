@@ -42,26 +42,35 @@ main(int argc, char **argv)
 	 * behavior for chained objects. */
 	uint32_t value1 = 0x00000123;
 	uint32_t value2 = 0x10000123;
+	uint32_t value3 = 0x20000123;
 	struct int_set_entry *entry;
 
 	set = int_set_create();
 
 	int_set_add(set, value1);
 	int_set_add(set, value2);
+	int_set_add(set, value3);
 
-	entry = int_set_search(set, value1);
-	assert(entry->value == value1);
+	entry = int_set_search(set, value3);
+	assert(entry->value == value3);
 
 	entry = int_set_search(set, value2);
 	assert(entry->value == value2);
 
-	int_set_remove(set, entry);
+	entry = int_set_search(set, value1);
+	assert(entry->value == value1);
+
+	int_set_remove_entry(set, entry);
+	int_set_remove(set, value2);
+
+	entry = int_set_search(set, value1);
+	assert(entry == NULL);
 
 	entry = int_set_search(set, value2);
 	assert(entry == NULL);
 
-	entry = int_set_search(set, value1);
-	assert(entry->value == value1);
+	entry = int_set_search(set, value3);
+	assert(entry->value == value3);
 
 	int_set_destroy(set);
 

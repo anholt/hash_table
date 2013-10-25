@@ -67,7 +67,11 @@ hash_table_search(struct hash_table *ht, uint32_t hash,
 		  const void *key);
 
 void
-hash_table_remove(struct hash_table *ht, struct hash_entry *entry);
+hash_table_remove(struct hash_table *ht, uint32_t hash,
+		  const void *key);
+
+void
+hash_table_remove_entry(struct hash_table *ht, struct hash_entry *entry);
 
 struct hash_entry *
 hash_table_next_entry(struct hash_table *ht,

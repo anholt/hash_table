@@ -47,7 +47,7 @@ main(int argc, char **argv)
 	assert(entry);
 	assert(entry->value == value);
 
-	int_set_remove(set, entry);
+	int_set_remove_entry(set, entry);
 
 	entry = int_set_search(set, value);
 	assert(!entry);

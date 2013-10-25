@@ -59,7 +59,10 @@ struct int_set_entry *
 int_set_search(struct int_set *set, uint32_t value);
 
 void
-int_set_remove(struct int_set *set, struct int_set_entry *entry);
+int_set_remove(struct int_set *set, uint32_t value);
+
+void
+int_set_remove_entry(struct int_set *set, struct int_set_entry *entry);
 
 struct int_set_entry *
 int_set_next_entry(struct int_set *set, struct int_set_entry *entry);

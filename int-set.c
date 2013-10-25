@@ -249,13 +249,31 @@ int_set_add(struct int_set *set, uint32_t value)
 }
 
 /**
+ * This function searches for, and removes an entry from the set.
+ *
+ * If the caller has previously found a struct int_set_entry pointer,
+ * (from calling int_set_search or remembering it from int_set_add),
+ * then int_set_remove_entry can be called instead to avoid an extra
+ * search.
+ */
+void
+int_set_remove(struct int_set *set, uint32_t value)
+{
+	struct int_set_entry *entry;
+
+	entry = int_set_search(set, value);
+
+	int_set_remove_entry(set, entry);
+}
+
+/**
  * This function deletes the given set entry.
  *
  * Note that deletion doesn't otherwise modify the table, so an iteration over
  * the table deleting entries is safe.
  */
 void
-int_set_remove(struct int_set *set, struct int_set_entry *entry)
+int_set_remove_entry(struct int_set *set, struct int_set_entry *entry)
 {
 	if (!entry)
 		return;

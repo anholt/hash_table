@@ -60,7 +60,10 @@ struct set_entry *
 set_search(struct set *set, uint32_t hash, const void *key);
 
 void
-set_remove(struct set *set, struct set_entry *entry);
+set_remove(struct set *set, uint32_t hash, const void *key);
+
+void
+set_remove_entry(struct set *set, struct set_entry *entry);
 
 struct set_entry *
 set_next_entry(struct set *set, struct set_entry *entry);
