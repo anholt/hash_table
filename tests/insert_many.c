@@ -29,8 +29,8 @@
 #include <string.h>
 #include <assert.h>
 #include "hash_table.h"
-#include "fnv_hash.h"
 
+/* Also doubles as hash function. */
 static uint32_t
 key_value(const void *key)
 {
@@ -52,16 +52,16 @@ main(int argc, char **argv)
 	uint32_t keys[size];
 	uint32_t i;
 
-	ht = hash_table_create(uint32_t_key_equals);
+	ht = hash_table_create(key_value, uint32_t_key_equals);
 
 	for (i = 0; i < size; i++) {
 		keys[i] = i;
 
-		hash_table_insert(ht, i, keys + i, NULL);
+		hash_table_insert(ht, keys + i, NULL);
 	}
 
 	for (i = 0; i < size; i++) {
-		entry = hash_table_search(ht, i, keys + i);
+		entry = hash_table_search_pre_hashed(ht, i, keys + i);
 		assert(entry);
 		assert(key_value(entry->key) == i);
 	}

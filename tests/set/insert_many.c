@@ -29,8 +29,8 @@
 #include <string.h>
 #include <assert.h>
 #include "set.h"
-#include "fnv_hash.h"
 
+/* Also double as hash function. */
 static uint32_t
 key_value(const void *key)
 {
@@ -52,17 +52,17 @@ main(int argc, char **argv)
 	uint32_t keys[size];
 	uint32_t i;
 
-	set = set_create(uint32_t_key_equals);
+	set = set_create(key_value, uint32_t_key_equals);
 
 	for (i = 0; i < size; i++) {
 		keys[i] = i;
 
-		set_add(set, i, keys + i);
+		set_add_pre_hashed(set, i, keys + i);
 	}
 
 	for (i = 0; i < size; i++) {
-		assert(set_contains(set, i, keys + i));
-		entry = set_search(set, i, keys + i);
+		assert(set_contains(set, keys + i));
+		entry = set_search_pre_hashed(set, i, keys + i);
 		assert(entry);
 		assert(key_value(entry->key) == i);
 	}

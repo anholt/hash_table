@@ -29,8 +29,8 @@
 #include <string.h>
 #include <assert.h>
 #include "set.h"
-#include "fnv_hash.h"
 
+/* Also doubles as hash function. */
 static uint32_t
 key_value(const void *key)
 {
@@ -58,12 +58,12 @@ main(int argc, char **argv)
 	uint32_t keys[size];
 	uint32_t i, random_value;
 
-	set = set_create(uint32_t_key_equals);
+	set = set_create(key_value, uint32_t_key_equals);
 
 	for (i = 0; i < size; i++) {
 		keys[i] = i;
 
-		set_add(set, i, keys + i);
+		set_add(set, keys + i);
 	}
 
 	/* Test the no-predicate case. */

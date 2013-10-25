@@ -38,6 +38,7 @@ struct set_entry {
 
 struct set {
 	struct set_entry *table;
+	uint32_t (*hash_function)(const void *key);
 	int (*key_equals_function)(const void *a, const void *b);
 	uint32_t size;
 	uint32_t rehash;
@@ -48,23 +49,24 @@ struct set {
 };
 
 struct set *
-set_create(int (*key_equals_function)(const void *a,
-				       const void *b));
+set_create(uint32_t (*hash_function)(const void *key),
+	   int (*key_equals_function)(const void *a,
+				      const void *b));
 void
 set_destroy(struct set *set,
 	    void (*delete_function)(struct set_entry *entry));
 
 struct set_entry *
-set_add(struct set *set, uint32_t hash, const void *key);
+set_add(struct set *set, const void *key);
 
 bool
-set_contains(struct set *set, uint32_t hash, const void *key);
+set_contains(struct set *set, const void *key);
 
 void
-set_remove(struct set *set, uint32_t hash, const void *key);
+set_remove(struct set *set, const void *key);
 
 struct set_entry *
-set_search(struct set *set, uint32_t hash, const void *key);
+set_search(struct set *set, const void *key);
 
 void
 set_remove_entry(struct set *set, struct set_entry *entry);
@@ -75,5 +77,12 @@ set_next_entry(struct set *set, struct set_entry *entry);
 struct set_entry *
 set_random_entry(struct set *set,
 		 int (*predicate)(struct set_entry *entry));
+
+/* Alternate interfaces to reduce repeated calls to hash function. */
+struct set_entry *
+set_search_pre_hashed(struct set *set, uint32_t hash, const void *key);
+
+struct set_entry *
+set_add_pre_hashed(struct set *set, uint32_t hash, const void *key);
 
 #endif

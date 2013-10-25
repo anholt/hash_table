@@ -42,6 +42,7 @@ struct hash_entry {
 
 struct hash_table {
 	struct hash_entry *table;
+	uint32_t (*hash_function)(const void *key);
 	int (*key_equals_function)(const void *a, const void *b);
 	uint32_t size;
 	uint32_t rehash;
@@ -52,23 +53,21 @@ struct hash_table {
 };
 
 struct hash_table *
-hash_table_create(int (*key_equals_function)(const void *a,
+hash_table_create(uint32_t (*hash_function)(const void *key),
+		  int (*key_equals_function)(const void *a,
 					     const void *b));
 void
 hash_table_destroy(struct hash_table *ht,
 		   void (*delete_function)(struct hash_entry *entry));
 
 struct hash_entry *
-hash_table_insert(struct hash_table *ht, uint32_t hash,
-		  const void *key, void *data);
+hash_table_insert(struct hash_table *ht, const void *key, void *data);
 
 struct hash_entry *
-hash_table_search(struct hash_table *ht, uint32_t hash,
-		  const void *key);
+hash_table_search(struct hash_table *ht, const void *key);
 
 void
-hash_table_remove(struct hash_table *ht, uint32_t hash,
-		  const void *key);
+hash_table_remove(struct hash_table *ht, const void *key);
 
 void
 hash_table_remove_entry(struct hash_table *ht, struct hash_entry *entry);
@@ -90,6 +89,18 @@ hash_table_random_entry(struct hash_table *ht,
 	for (entry = hash_table_next_entry(ht, NULL);		\
 	     entry != NULL;					\
 	     entry = hash_table_next_entry(ht, entry))
+
+/* Alternate interfaces to reduce repeated calls to hash function. */
+struct hash_entry *
+hash_table_search_pre_hashed(struct hash_table *ht,
+			     uint32_t hash,
+			     const void *key);
+
+struct hash_entry *
+hash_table_insert_pre_hashed(struct hash_table *ht,
+			     uint32_t hash,
+			     const void *key, void *data);
+
 
 #ifdef __cplusplus
 } /* extern C */

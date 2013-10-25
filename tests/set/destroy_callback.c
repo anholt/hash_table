@@ -52,12 +52,11 @@ main(int argc, char **argv)
 {
 	struct set *set;
 	uint32_t hash_str1 = fnv1_hash_string(str1);
-	uint32_t hash_str2 = fnv1_hash_string(str2);
 
-	set = set_create(string_key_equals);
+	set = set_create(fnv1_hash_string, string_key_equals);
 
-	set_add(set, hash_str1, str1);
-	set_add(set, hash_str2, str2);
+	set_add_pre_hashed(set, hash_str1, str1);
+	set_add(set, str2);
 
 	set_destroy(set, delete_callback);
 

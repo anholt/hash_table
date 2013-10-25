@@ -38,21 +38,27 @@ main(int argc, char **argv)
 	char *str1 = strdup("test1");
 	char *str2 = strdup("test1");
 	uint32_t hash_str1 = fnv1_hash_string(str1);
-	uint32_t hash_str2 = fnv1_hash_string(str2);
 	struct hash_entry *entry;
 
-	ht = hash_table_create(string_key_equals);
+	ht = hash_table_create(fnv1_hash_string, string_key_equals);
 
-	hash_table_insert(ht, hash_str1, str1, str1);
-	hash_table_insert(ht, hash_str2, str2, str2);
+	hash_table_insert_pre_hashed(ht, hash_str1, str1, str1);
+	hash_table_insert(ht, str2, str2);
 
-	entry = hash_table_search(ht, hash_str1, str1);
+	entry = hash_table_search_pre_hashed(ht, hash_str1, str1);
+	assert(entry);
+	assert(entry->data == str2);
+
+	entry = hash_table_search(ht, str1);
 	assert(entry);
 	assert(entry->data == str2);
 
 	hash_table_remove_entry(ht, entry);
 
-	entry = hash_table_search(ht, hash_str1, str1);
+	entry = hash_table_search_pre_hashed(ht, hash_str1, str1);
+	assert(!entry);
+
+	entry = hash_table_search(ht, str1);
 	assert(!entry);
 
 	hash_table_destroy(ht, NULL);

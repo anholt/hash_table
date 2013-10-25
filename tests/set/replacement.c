@@ -38,23 +38,22 @@ main(int argc, char **argv)
 	char *str1 = strdup("test1");
 	char *str2 = strdup("test1");
 	uint32_t hash_str1 = fnv1_hash_string(str1);
-	uint32_t hash_str2 = fnv1_hash_string(str2);
 	struct set_entry *entry;
 
-	set = set_create(string_key_equals);
+	set = set_create(fnv1_hash_string, string_key_equals);
 
-	set_add(set, hash_str1, str1);
-	set_add(set, hash_str2, str2);
+	set_add_pre_hashed(set, hash_str1, str1);
+	set_add(set, str2);
 
-	assert(set_contains(set, hash_str1, str1));
-	entry = set_search(set, hash_str1, str1);
+	assert(set_contains(set, str1));
+	entry = set_search_pre_hashed(set, hash_str1, str1);
 	assert(entry);
 	assert(entry->key == str2);
 
 	set_remove_entry(set, entry);
 
-	assert(!set_contains(set, hash_str1, str1));
-	entry = set_search(set, hash_str1, str1);
+	assert(!set_contains(set, str1));
+	entry = set_search(set, str1);
 	assert(!entry);
 
 	set_destroy(set, NULL);

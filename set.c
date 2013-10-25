@@ -102,8 +102,9 @@ entry_is_present(const struct set_entry *entry)
 }
 
 struct set *
-set_create(int key_equals_function(const void *a,
-					  const void *b))
+set_create(uint32_t (*hash_function)(const void *key),
+	   int key_equals_function(const void *a,
+				   const void *b))
 {
 	struct set *ht;
 
@@ -115,6 +116,7 @@ set_create(int key_equals_function(const void *a,
 	ht->size = hash_sizes[ht->size_index].size;
 	ht->rehash = hash_sizes[ht->size_index].rehash;
 	ht->max_entries = hash_sizes[ht->size_index].max_entries;
+	ht->hash_function = hash_function;
 	ht->key_equals_function = key_equals_function;
 	ht->table = calloc(ht->size, sizeof(*ht->table));
 	ht->entries = 0;
@@ -156,13 +158,26 @@ set_destroy(struct set *ht, void (*delete_function)(struct set_entry *entry))
 /* Does the set contain an entry with the given key and hash.
  */
 bool
-set_contains(struct set *ht, uint32_t hash, const void *key)
+set_contains(struct set *ht, const void *key)
 {
 	struct set_entry *entry;
 
-	entry = set_search(ht, hash, key);
+	entry = set_search(ht, key);
 
 	return entry != NULL;
+}
+
+/**
+ * Finds a set entry with the given key.
+ *
+ * Returns NULL if no entry is found.
+ */
+struct set_entry *
+set_search(struct set *ht, const void *key)
+{
+	uint32_t hash = ht->hash_function(key);
+
+	return set_search_pre_hashed (ht, hash, key);
 }
 
 /**
@@ -171,7 +186,7 @@ set_contains(struct set *ht, uint32_t hash, const void *key)
  * Returns NULL if no entry is found.
  */
 struct set_entry *
-set_search(struct set *ht, uint32_t hash, const void *key)
+set_search_pre_hashed(struct set *ht, uint32_t hash, const void *key)
 {
 	uint32_t hash_address;
 
@@ -224,11 +239,25 @@ set_rehash(struct set *ht, int new_size_index)
 	     entry != old_ht.table + old_ht.size;
 	     entry++) {
 		if (entry_is_present(entry)) {
-			set_add(ht, entry->hash, entry->key);
+			set_add_pre_hashed(ht, entry->hash, entry->key);
 		}
 	}
 
 	free(old_ht.table);
+}
+
+/**
+ * Inserts the key into the table.
+ *
+ * Note that insertion may rearrange the table on a resize or rehash,
+ * so previously found hash_entries are no longer valid after this function.
+ */
+struct set_entry *
+set_add(struct set *ht, const void *key)
+{
+	uint32_t hash = ht->hash_function(key);
+
+	return set_add_pre_hashed(ht, hash, key);
 }
 
 /**
@@ -238,7 +267,7 @@ set_rehash(struct set *ht, int new_size_index)
  * so previously found hash_entries are no longer valid after this function.
  */
 struct set_entry *
-set_add(struct set *ht, uint32_t hash, const void *key)
+set_add_pre_hashed(struct set *ht, uint32_t hash, const void *key)
 {
 	uint32_t hash_address;
 
@@ -298,11 +327,11 @@ set_add(struct set *ht, uint32_t hash, const void *key)
  * set_remove_entry can be called instead to avoid an extra search.
  */
 void
-set_remove(struct set *set, uint32_t hash, const void *key)
+set_remove(struct set *set, const void *key)
 {
 	struct set_entry *entry;
 
-	entry = set_search(set, hash, key);
+	entry = set_search(set, key);
 
 	set_remove_entry(set, entry);
 }

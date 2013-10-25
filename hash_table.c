@@ -102,8 +102,9 @@ entry_is_present(const struct hash_entry *entry)
 }
 
 struct hash_table *
-hash_table_create(int key_equals_function(const void *a,
-					  const void *b))
+hash_table_create(uint32_t (*hash_function)(const void *key),
+		  int (*key_equals_function)(const void *a,
+					     const void *b))
 {
 	struct hash_table *ht;
 
@@ -115,6 +116,7 @@ hash_table_create(int key_equals_function(const void *a,
 	ht->size = hash_sizes[ht->size_index].size;
 	ht->rehash = hash_sizes[ht->size_index].rehash;
 	ht->max_entries = hash_sizes[ht->size_index].max_entries;
+	ht->hash_function = hash_function;
 	ht->key_equals_function = key_equals_function;
 	ht->table = calloc(ht->size, sizeof(*ht->table));
 	ht->entries = 0;
@@ -153,13 +155,28 @@ hash_table_destroy(struct hash_table *ht,
 }
 
 /**
+ * Finds a hash table entry with the given key.
+ *
+ * Returns NULL if no entry is found.  Note that the data pointer may be
+ * modified by the user.
+ */
+struct hash_entry *
+hash_table_search(struct hash_table *ht, const void *key)
+{
+	uint32_t hash = ht->hash_function(key);
+
+	return hash_table_search_pre_hashed(ht, hash, key);
+}
+
+/**
  * Finds a hash table entry with the given key and hash of that key.
  *
  * Returns NULL if no entry is found.  Note that the data pointer may be
  * modified by the user.
  */
 struct hash_entry *
-hash_table_search(struct hash_table *ht, uint32_t hash, const void *key)
+hash_table_search_pre_hashed(struct hash_table *ht, uint32_t hash,
+			     const void *key)
 {
 	uint32_t start_hash_address = hash % ht->size;
 	uint32_t hash_address = start_hash_address;
@@ -209,10 +226,25 @@ hash_table_rehash(struct hash_table *ht, int new_size_index)
 	ht->deleted_entries = 0;
 
 	hash_table_foreach(&old_ht, entry) {
-		hash_table_insert(ht, entry->hash, entry->key, entry->data);
+		hash_table_insert_pre_hashed(ht, entry->hash,
+					     entry->key, entry->data);
 	}
 
 	free(old_ht.table);
+}
+
+/**
+ * Inserts the key into the table.
+ *
+ * Note that insertion may rearrange the table on a resize or rehash,
+ * so previously found hash_entries are no longer valid after this function.
+ */
+struct hash_entry *
+hash_table_insert(struct hash_table *ht, const void *key, void *data)
+{
+	uint32_t hash = ht->hash_function(key);
+
+	return hash_table_insert_pre_hashed(ht, hash, key, data);
 }
 
 /**
@@ -222,8 +254,8 @@ hash_table_rehash(struct hash_table *ht, int new_size_index)
  * so previously found hash_entries are no longer valid after this function.
  */
 struct hash_entry *
-hash_table_insert(struct hash_table *ht, uint32_t hash,
-		  const void *key, void *data)
+hash_table_insert_pre_hashed(struct hash_table *ht, uint32_t hash,
+			     const void *key, void *data)
 {
 	uint32_t start_hash_address, hash_address;
 
@@ -288,11 +320,11 @@ hash_table_insert(struct hash_table *ht, uint32_t hash,
  * instead to avoid an extra search.
  */
 void
-hash_table_remove(struct hash_table *ht, uint32_t hash, const void *key)
+hash_table_remove(struct hash_table *ht, const void *key)
 {
 	struct hash_entry *entry;
 
-	entry = hash_table_search(ht, hash, key);
+	entry = hash_table_search(ht, key);
 
 	hash_table_remove_entry(ht, entry);
 }

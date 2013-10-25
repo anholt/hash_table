@@ -48,41 +48,39 @@ main(int argc, char **argv)
 	const char *str2 = "test2";
 	const char *str3 = "test3";
 	uint32_t hash_str1 = badhash(str1);
-	uint32_t hash_str2 = badhash(str2);
-	uint32_t hash_str3 = badhash(str3);
 	struct set_entry *entry;
 
-	set = set_create(string_key_equals);
+	set = set_create(badhash, string_key_equals);
 
-	set_add(set, hash_str1, str1);
-	set_add(set, hash_str2, str2);
-	set_add(set, hash_str2, str3);
+	set_add_pre_hashed(set, hash_str1, str1);
+	set_add(set, str2);
+	set_add(set, str3);
 
-	assert(set_contains(set, hash_str3, str3));
-	entry = set_search(set, hash_str3, str3);
+	assert(set_contains(set, str3));
+	entry = set_search(set, str3);
 	assert(strcmp(entry->key, str3) == 0);
 
-	assert(set_contains(set, hash_str2, str2));
-	entry = set_search(set, hash_str2, str2);
+	assert(set_contains(set, str2));
+	entry = set_search(set, str2);
 	assert(strcmp(entry->key, str2) == 0);
 
-	assert(set_contains(set, hash_str1, str1));
-	entry = set_search(set, hash_str1, str1);
+	assert(set_contains(set, str1));
+	entry = set_search_pre_hashed(set, hash_str1, str1);
 	assert(strcmp(entry->key, str1) == 0);
 
 	set_remove_entry(set, entry);
-	set_remove(set, hash_str2, str2);
+	set_remove(set, str2);
 
-	assert(!set_contains(set, hash_str1, str1));
-	entry = set_search(set, hash_str1, str1);
+	assert(!set_contains(set, str1));
+	entry = set_search_pre_hashed(set, hash_str1, str1);
 	assert(entry == NULL);
 
-	assert(!set_contains(set, hash_str2, str2));
-	entry = set_search(set, hash_str2, str2);
+	assert(!set_contains(set, str2));
+	entry = set_search(set, str2);
 	assert(entry == NULL);
 
-	assert(set_contains(set, hash_str3, str3));
-	entry = set_search(set, hash_str3, str3);
+	assert(set_contains(set, str3));
+	entry = set_search(set, str3);
 	assert(strcmp(entry->key, str3) == 0);
 
 	set_destroy(set, NULL);
