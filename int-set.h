@@ -29,6 +29,7 @@
 #define SET_H
 
 #include <inttypes.h>
+#include <stdbool.h>
 
 struct int_set_entry {
 	uint32_t value;
@@ -55,11 +56,14 @@ int_set_destroy(struct int_set *set);
 struct int_set_entry *
 int_set_add(struct int_set *set, uint32_t value);
 
-struct int_set_entry *
-int_set_search(struct int_set *set, uint32_t value);
+bool
+int_set_contains(struct int_set *set, uint32_t value);
 
 void
 int_set_remove(struct int_set *set, uint32_t value);
+
+struct int_set_entry *
+int_set_search(struct int_set *set, uint32_t value);
 
 void
 int_set_remove_entry(struct int_set *set, struct int_set_entry *entry);

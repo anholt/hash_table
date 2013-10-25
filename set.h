@@ -29,6 +29,7 @@
 #define SET_H
 
 #include <inttypes.h>
+#include <stdbool.h>
 
 struct set_entry {
 	uint32_t hash;
@@ -56,11 +57,14 @@ set_destroy(struct set *set,
 struct set_entry *
 set_add(struct set *set, uint32_t hash, const void *key);
 
-struct set_entry *
-set_search(struct set *set, uint32_t hash, const void *key);
+bool
+set_contains(struct set *set, uint32_t hash, const void *key);
 
 void
 set_remove(struct set *set, uint32_t hash, const void *key);
+
+struct set_entry *
+set_search(struct set *set, uint32_t hash, const void *key);
 
 void
 set_remove_entry(struct set *set, struct set_entry *entry);

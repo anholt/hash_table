@@ -51,24 +51,30 @@ main(int argc, char **argv)
 	int_set_add(set, value2);
 	int_set_add(set, value3);
 
+	assert(int_set_contains(set, value3));
 	entry = int_set_search(set, value3);
 	assert(entry->value == value3);
 
+	assert(int_set_contains(set, value2));
 	entry = int_set_search(set, value2);
 	assert(entry->value == value2);
 
+	assert(int_set_contains(set, value1));
 	entry = int_set_search(set, value1);
 	assert(entry->value == value1);
 
 	int_set_remove_entry(set, entry);
 	int_set_remove(set, value2);
 
+	assert(!int_set_contains(set, value1));
 	entry = int_set_search(set, value1);
 	assert(entry == NULL);
 
+	assert(!int_set_contains(set, value2));
 	entry = int_set_search(set, value2);
 	assert(entry == NULL);
 
+	assert(int_set_contains(set, value3));
 	entry = int_set_search(set, value3);
 	assert(entry->value == value3);
 

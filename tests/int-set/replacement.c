@@ -43,12 +43,14 @@ main(int argc, char **argv)
 	int_set_add(set, value);
 	int_set_add(set, value);
 
+	assert(int_set_contains(set, value));
 	entry = int_set_search(set, value);
 	assert(entry);
 	assert(entry->value == value);
 
 	int_set_remove_entry(set, entry);
 
+	assert(!int_set_contains(set, value));
 	entry = int_set_search(set, value);
 	assert(!entry);
 

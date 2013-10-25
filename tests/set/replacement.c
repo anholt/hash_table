@@ -46,12 +46,14 @@ main(int argc, char **argv)
 	set_add(set, hash_str1, str1);
 	set_add(set, hash_str2, str2);
 
+	assert(set_contains(set, hash_str1, str1));
 	entry = set_search(set, hash_str1, str1);
 	assert(entry);
 	assert(entry->key == str2);
 
 	set_remove_entry(set, entry);
 
+	assert(!set_contains(set, hash_str1, str1));
 	entry = set_search(set, hash_str1, str1);
 	assert(!entry);
 

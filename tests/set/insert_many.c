@@ -61,6 +61,7 @@ main(int argc, char **argv)
 	}
 
 	for (i = 0; i < size; i++) {
+		assert(set_contains(set, i, keys + i));
 		entry = set_search(set, i, keys + i);
 		assert(entry);
 		assert(key_value(entry->key) == i);

@@ -46,6 +46,7 @@ main(int argc, char **argv)
 	}
 
 	for (i = 0; i < size; i++) {
+		assert(int_set_contains(set, i));
 		entry = int_set_search(set, i);
 		assert(entry);
 		assert(entry->value == i);

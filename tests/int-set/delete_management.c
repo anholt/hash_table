@@ -52,6 +52,7 @@ main(int argc, char **argv)
 
 	/* Make sure that all our entries were present at the end. */
 	for (i = size - 100; i < size; i++) {
+		assert(int_set_contains(set, i));
 		entry = int_set_search(set, i);
 		assert(entry);
 		assert(entry->value == i);

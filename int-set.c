@@ -137,6 +137,18 @@ int_set_destroy(struct int_set *set)
 	free(set);
 }
 
+/* Does the set contain an entry with the given value.
+ */
+bool
+int_set_contains(struct int_set *set, uint32_t value)
+{
+	struct int_set_entry *entry;
+
+	entry = int_set_search(set, value);
+
+	return entry != NULL;
+}
+
 /**
  * Finds a set entry with the given value
  *

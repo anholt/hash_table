@@ -153,6 +153,18 @@ set_destroy(struct set *ht, void (*delete_function)(struct set_entry *entry))
 	free(ht);
 }
 
+/* Does the set contain an entry with the given key and hash.
+ */
+bool
+set_contains(struct set *ht, uint32_t hash, const void *key)
+{
+	struct set_entry *entry;
+
+	entry = set_search(ht, hash, key);
+
+	return entry != NULL;
+}
+
 /**
  * Finds a set entry with the given key and hash of that key.
  *
