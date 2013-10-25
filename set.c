@@ -106,28 +106,28 @@ set_create(uint32_t (*hash_function)(const void *key),
 	   int key_equals_function(const void *a,
 				   const void *b))
 {
-	struct set *ht;
+	struct set *set;
 
-	ht = malloc(sizeof(*ht));
-	if (ht == NULL)
+	set = malloc(sizeof(*set));
+	if (set == NULL)
 		return NULL;
 
-	ht->size_index = 0;
-	ht->size = hash_sizes[ht->size_index].size;
-	ht->rehash = hash_sizes[ht->size_index].rehash;
-	ht->max_entries = hash_sizes[ht->size_index].max_entries;
-	ht->hash_function = hash_function;
-	ht->key_equals_function = key_equals_function;
-	ht->table = calloc(ht->size, sizeof(*ht->table));
-	ht->entries = 0;
-	ht->deleted_entries = 0;
+	set->size_index = 0;
+	set->size = hash_sizes[set->size_index].size;
+	set->rehash = hash_sizes[set->size_index].rehash;
+	set->max_entries = hash_sizes[set->size_index].max_entries;
+	set->hash_function = hash_function;
+	set->key_equals_function = key_equals_function;
+	set->table = calloc(set->size, sizeof(*set->table));
+	set->entries = 0;
+	set->deleted_entries = 0;
 
-	if (ht->table == NULL) {
-		free(ht);
+	if (set->table == NULL) {
+		free(set);
 		return NULL;
 	}
 
-	return ht;
+	return set;
 }
 
 /**
@@ -137,32 +137,32 @@ set_create(uint32_t (*hash_function)(const void *key),
  * freeing.
  */
 void
-set_destroy(struct set *ht, void (*delete_function)(struct set_entry *entry))
+set_destroy(struct set *set, void (*delete_function)(struct set_entry *entry))
 {
-	if (!ht)
+	if (!set)
 		return;
 
 	if (delete_function) {
 		struct set_entry *entry;
 
-		for (entry = set_next_entry(ht, NULL);
+		for (entry = set_next_entry(set, NULL);
 		     entry != NULL;
-		     entry = set_next_entry(ht, entry)) {
+		     entry = set_next_entry(set, entry)) {
 			delete_function(entry);
 		}
 	}
-	free(ht->table);
-	free(ht);
+	free(set->table);
+	free(set);
 }
 
-/* Does the set contain an entry with the given key and hash.
+/* Does the set contain an entry with the given key.
  */
 bool
-set_contains(struct set *ht, const void *key)
+set_contains(struct set *set, const void *key)
 {
 	struct set_entry *entry;
 
-	entry = set_search(ht, key);
+	entry = set_search(set, key);
 
 	return entry != NULL;
 }
@@ -173,11 +173,11 @@ set_contains(struct set *ht, const void *key)
  * Returns NULL if no entry is found.
  */
 struct set_entry *
-set_search(struct set *ht, const void *key)
+set_search(struct set *set, const void *key)
 {
-	uint32_t hash = ht->hash_function(key);
+	uint32_t hash = set->hash_function(key);
 
-	return set_search_pre_hashed (ht, hash, key);
+	return set_search_pre_hashed (set, hash, key);
 }
 
 /**
@@ -186,108 +186,110 @@ set_search(struct set *ht, const void *key)
  * Returns NULL if no entry is found.
  */
 struct set_entry *
-set_search_pre_hashed(struct set *ht, uint32_t hash, const void *key)
+set_search_pre_hashed(struct set *set, uint32_t hash, const void *key)
 {
 	uint32_t hash_address;
 
-	hash_address = hash % ht->size;
+	hash_address = hash % set->size;
 	do {
 		uint32_t double_hash;
 
-		struct set_entry *entry = ht->table + hash_address;
+		struct set_entry *entry = set->table + hash_address;
 
 		if (entry_is_free(entry)) {
 			return NULL;
 		} else if (entry_is_present(entry) && entry->hash == hash) {
-			if (ht->key_equals_function(key, entry->key)) {
+			if (set->key_equals_function(key, entry->key)) {
 				return entry;
 			}
 		}
 
-		double_hash = 1 + hash % ht->rehash;
+		double_hash = 1 + hash % set->rehash;
 
-		hash_address = (hash_address + double_hash) % ht->size;
-	} while (hash_address != hash % ht->size);
+		hash_address = (hash_address + double_hash) % set->size;
+	} while (hash_address != hash % set->size);
 
 	return NULL;
 }
 
 static void
-set_rehash(struct set *ht, int new_size_index)
+set_rehash(struct set *set, int new_size_index)
 {
-	struct set old_ht;
+	struct set old_set;
 	struct set_entry *table, *entry;
 
 	if (new_size_index >= ARRAY_SIZE(hash_sizes))
 		return;
 
-	table = calloc(hash_sizes[new_size_index].size, sizeof(*ht->table));
+	table = calloc(hash_sizes[new_size_index].size, sizeof(*set->table));
 	if (table == NULL)
 		return;
 
-	old_ht = *ht;
+	old_set = *set;
 
-	ht->table = table;
-	ht->size_index = new_size_index;
-	ht->size = hash_sizes[ht->size_index].size;
-	ht->rehash = hash_sizes[ht->size_index].rehash;
-	ht->max_entries = hash_sizes[ht->size_index].max_entries;
-	ht->entries = 0;
-	ht->deleted_entries = 0;
+	set->table = table;
+	set->size_index = new_size_index;
+	set->size = hash_sizes[set->size_index].size;
+	set->rehash = hash_sizes[set->size_index].rehash;
+	set->max_entries = hash_sizes[set->size_index].max_entries;
+	set->entries = 0;
+	set->deleted_entries = 0;
 
-	for (entry = old_ht.table;
-	     entry != old_ht.table + old_ht.size;
+	for (entry = old_set.table;
+	     entry != old_set.table + old_set.size;
 	     entry++) {
 		if (entry_is_present(entry)) {
-			set_add_pre_hashed(ht, entry->hash, entry->key);
+			set_add_pre_hashed(set, entry->hash, entry->key);
 		}
 	}
 
-	free(old_ht.table);
+	free(old_set.table);
 }
 
 /**
- * Inserts the key into the table.
+ * Inserts the key into the set.
  *
- * Note that insertion may rearrange the table on a resize or rehash,
- * so previously found hash_entries are no longer valid after this function.
+ * Note that insertion may rearrange the set on a resize or rehash, so
+ * previously found set_entry pointers are no longer valid after this
+ * function.
  */
 struct set_entry *
-set_add(struct set *ht, const void *key)
+set_add(struct set *set, const void *key)
 {
-	uint32_t hash = ht->hash_function(key);
+	uint32_t hash = set->hash_function(key);
 
-	return set_add_pre_hashed(ht, hash, key);
+	return set_add_pre_hashed(set, hash, key);
 }
 
 /**
- * Inserts the key with the given hash into the table.
+ * Inserts the key with the given hash into the set.
  *
- * Note that insertion may rearrange the table on a resize or rehash,
- * so previously found hash_entries are no longer valid after this function.
+ * Note that insertion may rearrange the set on a resize or rehash, so
+ * previously found set_entry pointers are no longer valid after this
+ * function.
  */
 struct set_entry *
-set_add_pre_hashed(struct set *ht, uint32_t hash, const void *key)
+set_add_pre_hashed(struct set *set, uint32_t hash, const void *key)
 {
 	uint32_t hash_address;
 
-	if (ht->entries >= ht->max_entries) {
-		set_rehash(ht, ht->size_index + 1);
-	} else if (ht->deleted_entries + ht->entries >= ht->max_entries) {
-		set_rehash(ht, ht->size_index);
+	if (set->entries >= set->max_entries) {
+		set_rehash(set, set->size_index + 1);
+	} else if (set->deleted_entries + set->entries >= set->max_entries) {
+		set_rehash(set, set->size_index);
 	}
 
-	hash_address = hash % ht->size;
+	hash_address = hash % set->size;
 	do {
-		struct set_entry *entry = ht->table + hash_address;
+		struct set_entry *entry = set->table + hash_address;
 		uint32_t double_hash;
 
 		if (!entry_is_present(entry)) {
 			if (entry_is_deleted(entry))
-				ht->deleted_entries--;
+				set->deleted_entries--;
 			entry->hash = hash;
 			entry->key = key;
-			ht->entries++;
+			set->entries++;
 			return entry;
 		}
 
@@ -297,21 +299,20 @@ set_add_pre_hashed(struct set *ht, uint32_t hash, const void *key)
 		 * generally being "insert the new value as well, and
 		 * return it first when the key is searched for".
 		 *
-		 * Note that the hash table doesn't have a delete callback.
+		 * Note that the set doesn't have a delete callback.
 		 * If freeing of old keys is required to avoid memory leaks,
 		 * perform a search before inserting.
 		 */
 		if (entry->hash == hash &&
-		    ht->key_equals_function(key, entry->key)) {
+		    set->key_equals_function(key, entry->key)) {
 			entry->key = key;
 			return entry;
 		}
 
+		double_hash = 1 + hash % set->rehash;
 
-		double_hash = 1 + hash % ht->rehash;
-
-		hash_address = (hash_address + double_hash) % ht->size;
-	} while (hash_address != hash % ht->size);
+		hash_address = (hash_address + double_hash) % set->size;
+	} while (hash_address != hash % set->size);
 
 	/* We could hit here if a required resize failed. An unchecked-malloc
 	 * application could ignore this result.
@@ -337,37 +338,38 @@ set_remove(struct set *set, const void *key)
 }
 
 /**
- * This function deletes the given hash table entry.
+ * This function deletes the set given set entry.
  *
- * Note that deletion doesn't otherwise modify the table, so an iteration over
- * the table deleting entries is safe.
+ * Note that deletion doesn't otherwise modify the set, so an
+ * iteration over the set deleting entries is safe.
  */
 void
-set_remove_entry(struct set *ht, struct set_entry *entry)
+set_remove_entry(struct set *set, struct set_entry *entry)
 {
 	if (!entry)
 		return;
 
 	entry->key = deleted_key;
-	ht->entries--;
-	ht->deleted_entries++;
+	set->entries--;
+	set->deleted_entries++;
 }
 
 /**
- * This function is an iterator over the hash table.
+ * This function is an iterator over the set.
  *
- * Pass in NULL for the first entry, as in the start of a for loop.  Note that
- * an iteration over the table is O(table_size) not O(entries).
+ * Pass in NULL for the first entry, as in the start of a for loop.
+ * Note that an iteration over the set is O(table_size) not
+ * O(entries).
  */
 struct set_entry *
-set_next_entry(struct set *ht, struct set_entry *entry)
+set_next_entry(struct set *set, struct set_entry *entry)
 {
 	if (entry == NULL)
-		entry = ht->table;
+		entry = set->table;
 	else
 		entry = entry + 1;
 
-	for (; entry != ht->table + ht->size; entry++) {
+	for (; entry != set->table + set->size; entry++) {
 		if (entry_is_present(entry)) {
 			return entry;
 		}
@@ -377,23 +379,23 @@ set_next_entry(struct set *ht, struct set_entry *entry)
 }
 
 struct set_entry *
-set_random_entry(struct set *ht,
+set_random_entry(struct set *set,
 		 int (*predicate)(struct set_entry *entry))
 {
 	struct set_entry *entry;
-	uint32_t i = random() % ht->size;
+	uint32_t i = random() % set->size;
 
-	if (ht->entries == 0)
+	if (set->entries == 0)
 		return NULL;
 
-	for (entry = ht->table + i; entry != ht->table + ht->size; entry++) {
+	for (entry = set->table + i; entry != set->table + set->size; entry++) {
 		if (entry_is_present(entry) &&
 		    (!predicate || predicate(entry))) {
 			return entry;
 		}
 	}
 
-	for (entry = ht->table; entry != ht->table + i; entry++) {
+	for (entry = set->table; entry != set->table + i; entry++) {
 		if (entry_is_present(entry) &&
 		    (!predicate || predicate(entry))) {
 			return entry;
