@@ -21,7 +21,7 @@
 
 SUBDIRS = set int-set
 
-AM_CFLAGS = $(WARN_CFLAGS) -I..
+AM_CFLAGS = $(WARN_CFLAGS) -I$(top_srcdir)
 LDADD = ../libhash_table.la
 
 TESTS = \
