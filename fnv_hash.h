@@ -31,4 +31,5 @@
 #include <inttypes.h>
 
 uint32_t fnv1_hash_string(const char *key);
+uint32_t fnv1_hash_data(const void *data, size_t size);
 int string_key_equals(const void *a, const void *b);
