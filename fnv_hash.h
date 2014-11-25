@@ -1,5 +1,6 @@
 /*
  * Copyright © 2009 Intel Corporation
+ * Copyright © 2014 Broadcom
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -32,4 +33,13 @@
 
 uint32_t fnv1_hash_string(const char *key);
 uint32_t fnv1_hash_data(const void *data, size_t size);
+
 int string_key_equals(const void *a, const void *b);
+
+#define hash_table_create_for_string() \
+	hash_table_create((uint32_t (*)(const void *key))fnv1_hash_string, \
+			  string_key_equals)
+
+#define set_create_for_string() \
+	set_create((uint32_t (*)(const void *key))fnv1_hash_string, \
+		   string_key_equals)

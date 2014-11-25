@@ -41,7 +41,7 @@ main(int argc, char **argv)
 	uint32_t bad_hash = 5;
 	int i;
 
-	ht = hash_table_create(fnv1_hash_string, string_key_equals);
+	ht = hash_table_create_for_string();
 
 	/* Add #1 and verify search. */
 	hash_table_insert_pre_hashed(ht, bad_hash, str1, NULL);

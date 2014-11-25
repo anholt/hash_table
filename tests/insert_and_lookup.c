@@ -40,7 +40,7 @@ main(int argc, char **argv)
 	uint32_t hash_str1 = fnv1_hash_string(str1);
 	struct hash_entry *entry;
 
-	ht = hash_table_create(fnv1_hash_string, string_key_equals);
+	ht = hash_table_create_for_string();
 
 	hash_table_insert_pre_hashed(ht, hash_str1, str1, NULL);
 	hash_table_insert(ht, str2, NULL);

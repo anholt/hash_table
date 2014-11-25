@@ -53,7 +53,7 @@ main(int argc, char **argv)
 	struct set *set;
 	uint32_t hash_str1 = fnv1_hash_string(str1);
 
-	set = set_create(fnv1_hash_string, string_key_equals);
+	set = set_create_for_string();
 
 	set_add_pre_hashed(set, hash_str1, str1);
 	set_add(set, str2);

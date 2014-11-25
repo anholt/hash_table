@@ -36,7 +36,7 @@ main(int argc, char **argv)
 {
 	struct hash_table *ht;
 
-	ht = hash_table_create(fnv1_hash_string, string_key_equals);
+	ht = hash_table_create_for_string();
 
 	hash_table_remove_entry(ht, NULL);
 

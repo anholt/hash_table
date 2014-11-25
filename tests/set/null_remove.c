@@ -36,7 +36,7 @@ main(int argc, char **argv)
 {
 	struct set *set;
 
-	set = set_create(fnv1_hash_string, string_key_equals);
+	set = set_create_for_string();
 
 	set_remove_entry(set, NULL);
 
