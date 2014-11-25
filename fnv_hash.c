@@ -24,10 +24,10 @@
  *    Eric Anholt <eric@anholt.net>
  */
 
-/* Quick FNV-1 hash implementation based on:
+/* Quick FNV-1a hash implementation based on:
  * http://www.isthe.com/chongo/tech/comp/fnv/
  *
- * FNV-1 may not be the best hash out there -- Jenkins's lookup3 is supposed
+ * FNV-1a may not be the best hash out there -- Jenkins's lookup3 is supposed
  * to be quite good, and it may beat FNV.  But FNV has the advantage that it
  * involves almost no code.
  */
