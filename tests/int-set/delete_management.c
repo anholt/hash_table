@@ -37,7 +37,6 @@ main(int argc, char **argv)
 	struct int_set *set;
 	struct int_set_entry *entry;
 	int size = 10000;
-	uint32_t keys[size];
 	uint32_t i;
 
 	set = int_set_create();
