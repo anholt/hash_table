@@ -30,6 +30,7 @@ TESTS = \
 	null_destroy \
 	null_remove \
 	random_entry \
+	replace_deleted \
 	replacement \
 	$()
 

@@ -237,8 +237,10 @@ int_set_add(struct int_set *set, uint32_t value)
 		uint32_t double_hash;
 
 		if (!entry_is_present(entry)) {
-			if (entry_is_deleted(entry))
+			if (entry_is_deleted(entry)) {
 				set->deleted_entries--;
+				entry->deleted = 0;
+			}
 			entry->value = value;
 			entry->occupied = 1;
 			set->entries++;
