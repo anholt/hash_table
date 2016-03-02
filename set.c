@@ -272,6 +272,7 @@ struct set_entry *
 set_add_pre_hashed(struct set *set, uint32_t hash, const void *key)
 {
 	uint32_t hash_address;
+	struct set_entry *available_entry = NULL;
 
 	if (set->entries >= set->max_entries) {
 		set_rehash(set, set->size_index + 1);
@@ -285,12 +286,11 @@ set_add_pre_hashed(struct set *set, uint32_t hash, const void *key)
 		uint32_t double_hash;
 
 		if (!entry_is_present(entry)) {
-			if (entry_is_deleted(entry))
-				set->deleted_entries--;
-			entry->hash = hash;
-			entry->key = key;
-			set->entries++;
-			return entry;
+			/* Stash the first available entry we find */
+			if (available_entry == NULL)
+				available_entry = entry;
+			if (entry_is_free(entry))
+				break;
 		}
 
 		/* Implement replacement when another insert happens
@@ -303,7 +303,8 @@ set_add_pre_hashed(struct set *set, uint32_t hash, const void *key)
 		 * If freeing of old keys is required to avoid memory leaks,
 		 * perform a search before inserting.
 		 */
-		if (entry->hash == hash &&
+		if (!entry_is_deleted(entry) &&
+		    entry->hash == hash &&
 		    set->key_equals_function(key, entry->key)) {
 			entry->key = key;
 			return entry;
@@ -313,6 +314,15 @@ set_add_pre_hashed(struct set *set, uint32_t hash, const void *key)
 
 		hash_address = (hash_address + double_hash) % set->size;
 	} while (hash_address != hash % set->size);
+
+	if (available_entry) {
+		if (entry_is_deleted(available_entry))
+			set->deleted_entries--;
+		available_entry->hash = hash;
+		available_entry->key = key;
+		set->entries++;
+		return available_entry;
+	}
 
 	/* We could hit here if a required resize failed. An unchecked-malloc
 	 * application could ignore this result.

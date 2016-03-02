@@ -224,6 +224,7 @@ struct int_set_entry *
 int_set_add(struct int_set *set, uint32_t value)
 {
 	uint32_t hash_address;
+	struct int_set_entry *available_entry = NULL;
 
 	if (set->entries >= set->max_entries) {
 		int_set_rehash(set, set->size_index + 1);
@@ -237,14 +238,14 @@ int_set_add(struct int_set *set, uint32_t value)
 		uint32_t double_hash;
 
 		if (!entry_is_present(entry)) {
+			if (available_entry == NULL)
+				available_entry = entry;
+			if (entry_is_free(entry))
+				break;
 			if (entry_is_deleted(entry)) {
 				set->deleted_entries--;
 				entry->deleted = 0;
 			}
-			entry->value = value;
-			entry->occupied = 1;
-			set->entries++;
-			return entry;
 		}
 
 		if (entry->value == value) {
@@ -255,6 +256,13 @@ int_set_add(struct int_set *set, uint32_t value)
 
 		hash_address = (hash_address + double_hash) % set->size;
 	} while (hash_address != value % set->size);
+
+	if (available_entry) {
+		available_entry->value = value;
+		available_entry->occupied = 1;
+		set->entries++;
+		return available_entry;
+	}
 
 	/* We could hit here if a required resize failed. An unchecked-malloc
 	 * application could ignore this result.
