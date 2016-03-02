@@ -23,6 +23,7 @@ AM_CFLAGS = $(WARN_CFLAGS) -I$(srcdir)/../..
 LDADD = ../../libset.la
 
 TESTS = \
+	collision_replacement \
 	delete_and_lookup \
 	delete_management \
 	deleted_key \

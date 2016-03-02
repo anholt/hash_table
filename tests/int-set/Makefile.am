@@ -23,6 +23,7 @@ AM_CFLAGS = $(WARN_CFLAGS) -I$(top_srcdir)
 LDADD = ../../libint-set.la
 
 TESTS = \
+	collision_replacement \
 	delete_and_lookup \
 	delete_management \
 	insert_and_lookup \

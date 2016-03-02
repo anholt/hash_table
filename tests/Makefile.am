@@ -26,6 +26,7 @@ LDADD = ../libhash_table.la
 
 TESTS = \
 	collision \
+	collision_replacement \
 	delete_and_lookup \
 	delete_management \
 	deleted_key \
