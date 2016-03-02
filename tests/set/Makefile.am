@@ -25,6 +25,7 @@ LDADD = ../../libset.la
 TESTS = \
 	delete_and_lookup \
 	delete_management \
+	deleted_key \
 	destroy_callback \
 	insert_and_lookup \
 	insert_many \
