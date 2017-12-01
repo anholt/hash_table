@@ -32,6 +32,7 @@
  *    Keith Packard <keithp@keithp.com>
  */
 
+#include <assert.h>
 #include <stdlib.h>
 
 #include "set.h"
@@ -257,6 +258,13 @@ struct set_entry *
 set_add(struct set *set, const void *key)
 {
 	uint32_t hash = set->hash_function(key);
+
+	/* Make sure nobody tries to add one of the magic values as a
+	 * key. If you need to do so, either do so in a wrapper, or
+	 * store keys with the magic values separately in the struct
+	 * set.
+	 */
+	assert(key != NULL);
 
 	return set_add_pre_hashed(set, hash, key);
 }

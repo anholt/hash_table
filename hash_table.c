@@ -32,6 +32,7 @@
  *    Keith Packard <keithp@keithp.com>
  */
 
+#include <assert.h>
 #include <stdlib.h>
 
 #include "hash_table.h"
@@ -243,6 +244,13 @@ struct hash_entry *
 hash_table_insert(struct hash_table *ht, const void *key, void *data)
 {
 	uint32_t hash = ht->hash_function(key);
+
+	/* Make sure nobody tries to add one of the magic values as a
+	 * key. If you need to do so, either do so in a wrapper, or
+	 * store keys with the magic values separately in the struct
+	 * hash_table.
+	 */
+	assert(key != NULL);
 
 	return hash_table_insert_pre_hashed(ht, hash, key, data);
 }
