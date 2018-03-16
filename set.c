@@ -146,9 +146,7 @@ set_destroy(struct set *set, void (*delete_function)(struct set_entry *entry))
 	if (delete_function) {
 		struct set_entry *entry;
 
-		for (entry = set_next_entry(set, NULL);
-		     entry != NULL;
-		     entry = set_next_entry(set, entry)) {
+		set_foreach(set, entry) {
 			delete_function(entry);
 		}
 	}
@@ -236,12 +234,8 @@ set_rehash(struct set *set, int new_size_index)
 	set->entries = 0;
 	set->deleted_entries = 0;
 
-	for (entry = old_set.table;
-	     entry != old_set.table + old_set.size;
-	     entry++) {
-		if (entry_is_present(entry)) {
-			set_add_pre_hashed(set, entry->hash, entry->key);
-		}
+	set_foreach(&old_set, entry) {
+		set_add_pre_hashed(set, entry->hash, entry->key);
 	}
 
 	free(old_set.table);
