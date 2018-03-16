@@ -78,6 +78,16 @@ struct set_entry *
 set_random_entry(struct set *set,
 		 int (*predicate)(struct set_entry *entry));
 
+/**
+ * This foreach function is safe against deletion (which just replaces
+ * an entry's data with the deleted marker), but not against insertion
+ * (which may rehash the table, making entry a dangling pointer).
+ */
+#define set_foreach(ht, entry)					\
+	for (entry = set_next_entry(ht, NULL);			\
+	     entry != NULL;					\
+	     entry = set_next_entry(ht, entry))
+
 /* Alternate interfaces to reduce repeated calls to hash function. */
 struct set_entry *
 set_search_pre_hashed(struct set *set, uint32_t hash, const void *key);
