@@ -42,6 +42,16 @@ libset = shared_library(
   ],
 )
 
+libhash_table_dep = declare_dependency(
+  include_directories: include_directories('.'),
+  link_with: libhash_table,
+)
+
+libset_dep = declare_dependency(
+  include_directories: include_directories('.'),
+  link_with: libset,
+)
+
 hash_tests = [
   'collision',
   'collision_replacement',
