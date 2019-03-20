@@ -32,6 +32,7 @@ libhash_table = shared_library(
     'hash_table.c',
     'fnv_hash.c',
   ],
+  install: true,
 )
 
 libset = shared_library(
@@ -40,6 +41,7 @@ libset = shared_library(
     'set.c',
     'fnv_hash.c',
   ],
+  install: true,
 )
 
 libhash_table_dep = declare_dependency(
